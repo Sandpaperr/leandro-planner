@@ -1,236 +1,94 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 const WHEEL_DOMAINS = [
-  'Mission',
-  'Money',
-  'Body',
-  'Spirit',
-  'Home & Environment',
-  'Growth',
-  'Romance',
-  'Family & Friends',
-  'Fun',
-  'Communities',
+  "Mission", "Money", "Body", "Spirit", "Home & Environment",
+  "Growth", "Romance", "Family & Friends", "Fun", "Communities"
 ];
 
 const QUARTERLY_EXERCISES = [
   {
-    id: 'wheel',
-    label: 'Wheel of Life',
-    instruction:
-      'Rate yourself honestly from 1 to 10 in each area. First number that comes to mind. No overthinking.',
+    id: "wheel",
+    label: "Wheel of Life",
+    instruction: "Rate yourself honestly from 1 to 10 in each area. First number that comes to mind. No overthinking.",
   },
   {
-    id: 'gaps',
-    label: 'Identify the Gaps',
+    id: "gaps",
+    label: "Identify the Gaps",
     questions: [
-      'Which 3 areas scored lowest?',
-      'Which gap, if closed, would have the biggest impact on everything else?',
+      "Which 3 areas scored lowest?",
+      "Which gap, if closed, would have the biggest impact on everything else?",
     ],
   },
   {
-    id: 'outcomes',
-    label: 'Define Your 3 Outcomes',
-    instruction:
-      'For each of your 3 focus areas, answer all 5 questions. Write in present tense, as if it has already happened.',
+    id: "outcomes",
+    label: "Define Your 3 Outcomes",
+    instruction: "For each of your 3 focus areas, answer all 5 questions. Write in present tense, as if it has already happened.",
     subSections: [
-      {
-        key: 'result',
-        label: 'Result',
-        prompt:
-          'What is the specific outcome? Write it as already done, present tense, emotionally charged.',
-        placeholder: 'I am... I have... I feel...',
-      },
-      {
-        key: 'purpose',
-        label: 'Purpose',
-        prompt:
-          'Why does this have to happen? What does it mean for your life, your freedom, your identity?',
-        placeholder: 'This matters because...',
-      },
-      {
-        key: 'map',
-        label: 'Massive Action Plan',
-        prompt:
-          'What are the 3 to 5 actions that will make this outcome inevitable?',
-        placeholder: 'The actions that move the needle...',
-      },
-      {
-        key: 'obstacles',
-        label: 'Obstacles',
-        prompt:
-          "What are the 2 to 3 things most likely to derail this? Name them now so they don't catch you off guard.",
-        placeholder: 'The things that will try to stop me...',
-      },
-      {
-        key: 'identity',
-        label: 'Identity',
-        prompt:
-          'Who do you need to become for this to be inevitable? Not what you need to do. Who you need to be.',
-        placeholder: 'I am someone who...',
-      },
+      { key: "result", label: "Result", prompt: "What is the specific outcome? Write it as already done, present tense, emotionally charged.", placeholder: "I am... I have... I feel..." },
+      { key: "purpose", label: "Purpose", prompt: "Why does this have to happen? What does it mean for your life, your freedom, your identity?", placeholder: "This matters because..." },
+      { key: "map", label: "Massive Action Plan", prompt: "What are the 3 to 5 actions that will make this outcome inevitable?", placeholder: "The actions that move the needle..." },
+      { key: "obstacles", label: "Obstacles", prompt: "What are the 2 to 3 things most likely to derail this? Name them now so they don't catch you off guard.", placeholder: "The things that will try to stop me..." },
+      { key: "identity", label: "Identity", prompt: "Who do you need to become for this to be inevitable? Not what you need to do. Who you need to be.", placeholder: "I am someone who..." },
     ],
   },
   {
-    id: 'sacrifice',
-    label: 'What You Will Give Up',
+    id: "sacrifice",
+    label: "What You Will Give Up",
     questions: [
-      'What behaviour, habit, or commitment has to stop for these 3 outcomes to happen?',
-      'What will you say no to this quarter that you would normally say yes to?',
+      "What behaviour, habit, or commitment has to stop for these 3 outcomes to happen?",
+      "What will you say no to this quarter that you would normally say yes to?",
     ],
   },
 ];
 
 const WEEKLY_QUESTIONS = [
-  {
-    number: '01',
-    question: 'Read your 3 outcomes out loud with full intensity. Own them.',
-    type: 'ritual',
-    label: 'Opening Ritual',
-  },
-  {
-    number: '02',
-    question: 'Where did I show up fully last week? Where did I hold back?',
-    type: 'text',
-    placeholder: 'Be brutally honest...',
-    label: 'Honest Review',
-  },
-  {
-    number: '03',
-    question: 'What am I most proud of this week?',
-    type: 'text',
-    placeholder: 'Your biggest win...',
-    label: 'Best Moment',
-  },
-  {
-    number: '04',
-    question: 'What did I learn that I will use immediately?',
-    type: 'text',
-    placeholder: 'The insight that changes next week...',
-    label: 'Key Learning',
-  },
-  {
-    number: '05',
-    question: 'What does this week demand of me?',
-    type: 'text',
-    placeholder: 'Check your calendar. What is this week asking of you?',
-    label: "This Week's Demand",
-  },
-  {
-    number: '06',
-    question: 'What 3 outcomes this week will move me closest to my vision?',
-    type: 'big3',
-    label: 'Weekly Big 3',
-  },
-  {
-    number: '07',
-    question:
-      'What is the single most important thing I will do first thing Monday morning?',
-    type: 'text',
-    placeholder: 'The one non-negotiable that starts the week right...',
-    label: 'Monday Anchor',
-  },
+  { number: "01", question: "Read your 3 outcomes out loud with full intensity. Own them.", type: "ritual", label: "Opening Ritual" },
+  { number: "02", question: "Where did I show up fully last week? Where did I hold back?", type: "text", placeholder: "Be brutally honest...", label: "Honest Review" },
+  { number: "03", question: "What am I most proud of this week?", type: "text", placeholder: "Your biggest win...", label: "Best Moment" },
+  { number: "04", question: "What did I learn that I will use immediately?", type: "text", placeholder: "The insight that changes next week...", label: "Key Learning" },
+  { number: "05", question: "What does this week demand of me?", type: "text", placeholder: "Check your calendar. What is this week asking of you?", label: "This Week's Demand" },
+  { number: "06", question: "What 3 outcomes this week will move me closest to my vision?", type: "big3", label: "Weekly Big 3" },
+  { number: "07", question: "What is the single most important thing I will do first thing Monday morning?", type: "text", placeholder: "The one non-negotiable that starts the week right...", label: "Monday Anchor" },
 ];
 
 const DAILY_MORNING = [
-  {
-    icon: '◎',
-    title: 'Daily Big 3',
-    prompt:
-      'From your Weekly Big 3, what are the 3 tasks that move the needle today?',
-    instruction:
-      'Write them first. Do them first. Everything else is secondary.',
-    fields: ['Big 3 #1', 'Big 3 #2', 'Big 3 #3'],
-  },
-  {
-    icon: '◈',
-    title: 'Block the Time',
-    prompt: 'When exactly will you do each of your Big 3 today?',
-    instruction:
-      "Unscheduled intentions don't happen. Assign a time slot to each one.",
-    fields: [
-      'Big 3 #1 — time block',
-      'Big 3 #2 — time block',
-      'Big 3 #3 — time block',
-    ],
-  },
+  { icon: "◎", title: "Daily Big 3", prompt: "From your Weekly Big 3, what are the 3 tasks that move the needle today?", instruction: "Write them first. Do them first. Everything else is secondary.", fields: ["Big 3 #1", "Big 3 #2", "Big 3 #3"] },
+  { icon: "◈", title: "Block the Time", prompt: "When exactly will you do each of your Big 3 today?", instruction: "Unscheduled intentions don't happen. Assign a time slot to each one.", fields: ["Big 3 #1 — time block", "Big 3 #2 — time block", "Big 3 #3 — time block"] },
 ];
 
 const DAILY_EVENING = [
-  {
-    icon: '◉',
-    title: 'One Win',
-    prompt: 'What are you most proud of today?',
-    instruction: 'One sentence. No more.',
-    placeholder: 'Today I...',
-  },
-  {
-    icon: '◌',
-    title: 'One Adjustment',
-    prompt: 'What would you do differently tomorrow?',
-    instruction: 'One thing only. Then close the book.',
-    placeholder: 'Tomorrow I will...',
-  },
+  { icon: "◉", title: "One Win", prompt: "What are you most proud of today?", instruction: "One sentence. No more.", placeholder: "Today I..." },
+  { icon: "◌", title: "One Adjustment", prompt: "What would you do differently tomorrow?", instruction: "One thing only. Then close the book.", placeholder: "Tomorrow I will..." },
 ];
 
 export default function PlanningSystem() {
-  const [tab, setTab] = useState('quarterly');
+  const [tab, setTab] = useState("quarterly");
   const [quarterlyStep, setQuarterlyStep] = useState(0);
-  const [scores, setScores] = useState({});
-  const [gapAnswers, setGapAnswers] = useState({});
-  const [outcomes, setOutcomes] = useState([
-    {
-      label: '',
-      result: '',
-      purpose: '',
-      map: '',
-      obstacles: '',
-      identity: '',
-    },
-    {
-      label: '',
-      result: '',
-      purpose: '',
-      map: '',
-      obstacles: '',
-      identity: '',
-    },
-    {
-      label: '',
-      result: '',
-      purpose: '',
-      map: '',
-      obstacles: '',
-      identity: '',
-    },
+  const [scores, setScores] = useState<Record<string, number>>({});
+  const [gapAnswers, setGapAnswers] = useState<Record<string, string>>({});
+  const [outcomes, setOutcomes] = useState<Array<Record<string, string>>>([
+    { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
+    { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
+    { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
   ]);
   const [activeOutcome, setActiveOutcome] = useState(0);
-  const [activeSubSection, setActiveSubSection] = useState('result');
-  const [sacrificeAnswers, setSacrificeAnswers] = useState({});
-  const [weeklyAnswers, setWeeklyAnswers] = useState({});
-  const [weeklyBig3, setWeeklyBig3] = useState(['', '', '']);
+  const [activeSubSection, setActiveSubSection] = useState("result");
+  const [sacrificeAnswers, setSacrificeAnswers] = useState<Record<string, string>>({});
+  const [weeklyAnswers, setWeeklyAnswers] = useState<Record<string, string>>({});
+  const [weeklyBig3, setWeeklyBig3] = useState(["", "", ""]);
   const [ritualDone, setRitualDone] = useState(false);
-  const [dailyMorning, setDailyMorning] = useState({
-    b1: '',
-    b2: '',
-    b3: '',
-    t1: '',
-    t2: '',
-    t3: '',
-  });
-  const [dailyEvening, setDailyEvening] = useState({ win: '', adjust: '' });
-  const [dateValue, setDateValue] = useState('');
+  const [dailyMorning, setDailyMorning] = useState({ b1: "", b2: "", b3: "", t1: "", t2: "", t3: "" });
+  const [dailyEvening, setDailyEvening] = useState({ win: "", adjust: "" });
+  const [dateValue, setDateValue] = useState("");
 
-  const updateOutcome = (idx, field, value) => {
-    setOutcomes((prev) =>
-      prev.map((o, i) => (i === idx ? { ...o, [field]: value } : o))
-    );
+  const updateOutcome = (idx: number, field: string, value: string) => {
+    setOutcomes((prev) => prev.map((o, i) => i === idx ? { ...o, [field]: value } : o));
   };
 
   const steps = QUARTERLY_EXERCISES;
 
   return (
-    <div style={{ background: '#F7F3EC', minHeight: '100vh' }}>
+    <div style={{ background: "#F7F3EC", minHeight: "100vh" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&family=Lato:wght@300;400;700&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -390,26 +248,14 @@ export default function PlanningSystem() {
       <div className="app">
         <div className="hd no-print">
           <p className="hd-eyebrow">Personal Planning System</p>
-          <h1 className="hd-title">
-            The Questions &amp; <em>Exercises</em>
-          </h1>
-          <p className="hd-sub">
-            Quarterly outcomes. Weekly review. Daily execution.
-          </p>
+          <h1 className="hd-title">The Questions &amp; <em>Exercises</em></h1>
+          <p className="hd-sub">Quarterly outcomes. Weekly review. Daily execution.</p>
         </div>
 
         <div className="tab-bar no-print">
           <div className="main-tabs">
-            {[
-              { id: 'quarterly', label: 'Quarterly' },
-              { id: 'weekly', label: 'Weekly' },
-              { id: 'daily', label: 'Daily' },
-            ].map((t) => (
-              <button
-                key={t.id}
-                className={`main-tab ${tab === t.id ? 'on' : ''}`}
-                onClick={() => setTab(t.id)}
-              >
+            {[{ id: "quarterly", label: "Quarterly" }, { id: "weekly", label: "Weekly" }, { id: "daily", label: "Daily" }].map((t) => (
+              <button key={t.id} className={`main-tab ${tab === t.id ? "on" : ""}`} onClick={() => setTab(t.id)}>
                 {t.label}
               </button>
             ))}
@@ -432,48 +278,32 @@ export default function PlanningSystem() {
         </div>
 
         {/* QUARTERLY */}
-        {tab === 'quarterly' && (
+        {tab === "quarterly" && (
           <div>
             <div className="step-nav no-print">
               {steps.map((s, i) => (
-                <button
-                  key={s.id}
-                  className={`step-btn ${quarterlyStep === i ? 'on' : ''}`}
-                  onClick={() => setQuarterlyStep(i)}
-                >
+                <button key={s.id} className={`step-btn ${quarterlyStep === i ? "on" : ""}`} onClick={() => setQuarterlyStep(i)}>
                   {s.label}
                 </button>
               ))}
             </div>
 
             {/* WHEEL */}
-            <div className={`q-section ${quarterlyStep === 0 ? 'active' : ''}`}>
+            <div className={`q-section ${quarterlyStep === 0 ? "active" : ""}`}>
               <div className="card">
                 <div className="card-header">
                   <span className="card-label">Step 01</span>
                   <span className="card-title">Wheel of Life</span>
                 </div>
                 <div className="card-body">
-                  <p className="instruction">
-                    {QUARTERLY_EXERCISES[0].instruction}
-                  </p>
+                  <p className="instruction">{QUARTERLY_EXERCISES[0].instruction}</p>
                   <div className="wheel-grid">
                     {WHEEL_DOMAINS.map((domain) => (
                       <div className="wheel-item" key={domain}>
                         <span className="wheel-label">{domain}</span>
                         <div className="wheel-score-row">
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
-                            <button
-                              key={n}
-                              className={`score-btn ${
-                                scores[domain] === n ? 'selected' : ''
-                              }`}
-                              onClick={() =>
-                                setScores((prev) => ({ ...prev, [domain]: n }))
-                              }
-                            >
-                              {n}
-                            </button>
+                          {[1,2,3,4,5,6,7,8,9,10].map((n) => (
+                            <button key={n} className={`score-btn ${scores[domain] === n ? "selected" : ""}`} onClick={() => setScores((prev) => ({ ...prev, [domain]: n }))}>{n}</button>
                           ))}
                         </div>
                       </div>
@@ -484,7 +314,7 @@ export default function PlanningSystem() {
             </div>
 
             {/* GAPS */}
-            <div className={`q-section ${quarterlyStep === 1 ? 'active' : ''}`}>
+            <div className={`q-section ${quarterlyStep === 1 ? "active" : ""}`}>
               <div className="card">
                 <div className="card-header">
                   <span className="card-label">Step 02</span>
@@ -495,17 +325,7 @@ export default function PlanningSystem() {
                     {QUARTERLY_EXERCISES[1].questions.map((q, i) => (
                       <div className="q-item" key={i}>
                         <p className="q-prompt">{q}</p>
-                        <textarea
-                          className="field field-sm"
-                          placeholder="Write your answer..."
-                          value={gapAnswers[`q${i}`] || ''}
-                          onChange={(e) =>
-                            setGapAnswers((prev) => ({
-                              ...prev,
-                              [`q${i}`]: e.target.value,
-                            }))
-                          }
-                        />
+                        <textarea className="field field-sm" placeholder="Write your answer..." value={gapAnswers[`q${i}`] || ""} onChange={(e) => setGapAnswers((prev) => ({ ...prev, [`q${i}`]: e.target.value }))} />
                       </div>
                     ))}
                   </div>
@@ -514,93 +334,38 @@ export default function PlanningSystem() {
             </div>
 
             {/* OUTCOMES */}
-            <div className={`q-section ${quarterlyStep === 2 ? 'active' : ''}`}>
-              <p
-                className="instruction no-print"
-                style={{
-                  marginBottom: 16,
-                  fontFamily: "'Lato', sans-serif",
-                  fontSize: 15,
-                  fontStyle: 'italic',
-                  color: 'var(--ink-muted)',
-                }}
-              >
+            <div className={`q-section ${quarterlyStep === 2 ? "active" : ""}`}>
+              <p className="instruction no-print" style={{ marginBottom: 16, fontFamily: "'Lato', sans-serif", fontSize: 15, fontStyle: "italic", color: "var(--ink-muted)" }}>
                 {QUARTERLY_EXERCISES[2].instruction}
               </p>
 
               <div className="outcome-tabs no-print">
                 {outcomes.map((o, i) => (
-                  <div
-                    key={i}
-                    className={`outcome-tab ${activeOutcome === i ? 'on' : ''}`}
-                    onClick={() => {
-                      setActiveOutcome(i);
-                      setActiveSubSection('result');
-                    }}
-                  >
+                  <div key={i} className={`outcome-tab ${activeOutcome === i ? "on" : ""}`} onClick={() => { setActiveOutcome(i); setActiveSubSection("result"); }}>
                     <span className="outcome-tab-n">0{i + 1}</span>
-                    <span className="outcome-tab-name">
-                      {o.label || `Outcome ${i + 1}`}
-                    </span>
+                    <span className="outcome-tab-name">{o.label || `Outcome ${i + 1}`}</span>
                   </div>
                 ))}
               </div>
 
               {outcomes.map((o, oi) => (
-                <div
-                  key={oi}
-                  className={`outcome-block ${
-                    activeOutcome === oi ? 'active' : ''
-                  }`}
-                >
+                <div key={oi} className={`outcome-block ${activeOutcome === oi ? "active" : ""}`}>
                   <div className="card">
                     <div className="card-body">
-                      <div className="outcome-title-print">
-                        0{oi + 1} — {o.label || `Outcome ${oi + 1}`}
-                      </div>
+                      <div className="outcome-title-print">0{oi + 1} — {o.label || `Outcome ${oi + 1}`}</div>
 
-                      <input
-                        className={`outcome-label-input ${
-                          activeOutcome === oi ? '' : 'no-print'
-                        }`}
-                        placeholder="Name this outcome area (e.g. Money, Body, Sabroso...)"
-                        value={o.label}
-                        onChange={(e) =>
-                          updateOutcome(oi, 'label', e.target.value)
-                        }
-                      />
+                      <input className={`outcome-label-input ${activeOutcome === oi ? "" : "no-print"}`} placeholder="Name this outcome area (e.g. Money, Body, Sabroso...)" value={o.label} onChange={(e) => updateOutcome(oi, "label", e.target.value)} />
 
                       <div className="sub-tabs no-print">
                         {QUARTERLY_EXERCISES[2].subSections.map((s) => (
-                          <button
-                            key={s.key}
-                            className={`sub-tab ${
-                              activeSubSection === s.key ? 'on' : ''
-                            }`}
-                            onClick={() => setActiveSubSection(s.key)}
-                          >
-                            {s.label}
-                          </button>
+                          <button key={s.key} className={`sub-tab ${activeSubSection === s.key ? "on" : ""}`} onClick={() => setActiveSubSection(s.key)}>{s.label}</button>
                         ))}
                       </div>
 
                       {QUARTERLY_EXERCISES[2].subSections.map((s) => (
-                        <div
-                          key={s.key}
-                          className={`subsection-block ${
-                            activeSubSection === s.key ? 'active' : ''
-                          }`}
-                        >
+                        <div key={s.key} className={`subsection-block ${activeSubSection === s.key ? "active" : ""}`}>
                           <p className="sub-prompt">{s.prompt}</p>
-                          <textarea
-                            className="field"
-                            style={{ minHeight: 80 }}
-                            placeholder={s.placeholder}
-                            value={o[s.key]}
-                            onChange={(e) =>
-                              updateOutcome(oi, s.key, e.target.value)
-                            }
-                          />
+                          <textarea className="field" style={{ minHeight: 80 }} placeholder={s.placeholder} value={o[s.key]} onChange={(e) => updateOutcome(oi, s.key, e.target.value)} />
                         </div>
                       ))}
                     </div>
@@ -610,7 +375,7 @@ export default function PlanningSystem() {
             </div>
 
             {/* SACRIFICE */}
-            <div className={`q-section ${quarterlyStep === 3 ? 'active' : ''}`}>
+            <div className={`q-section ${quarterlyStep === 3 ? "active" : ""}`}>
               <div className="card">
                 <div className="card-header">
                   <span className="card-label">Step 04</span>
@@ -621,17 +386,7 @@ export default function PlanningSystem() {
                     {QUARTERLY_EXERCISES[3].questions.map((q, i) => (
                       <div className="q-item" key={i}>
                         <p className="q-prompt">{q}</p>
-                        <textarea
-                          className="field"
-                          placeholder="Write your answer..."
-                          value={sacrificeAnswers[`q${i}`] || ''}
-                          onChange={(e) =>
-                            setSacrificeAnswers((prev) => ({
-                              ...prev,
-                              [`q${i}`]: e.target.value,
-                            }))
-                          }
-                        />
+                        <textarea className="field" placeholder="Write your answer..." value={sacrificeAnswers[`q${i}`] || ""} onChange={(e) => setSacrificeAnswers((prev) => ({ ...prev, [`q${i}`]: e.target.value }))} />
                       </div>
                     ))}
                   </div>
@@ -642,8 +397,8 @@ export default function PlanningSystem() {
         )}
 
         {/* WEEKLY */}
-        {tab === 'weekly' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+        {tab === "weekly" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {WEEKLY_QUESTIONS.map((item, i) => (
               <div className="card" key={i}>
                 <div className="card-header">
@@ -651,56 +406,28 @@ export default function PlanningSystem() {
                   <span className="card-label">{item.label}</span>
                 </div>
                 <div className="card-body">
-                  {item.type === 'ritual' && (
+                  {item.type === "ritual" && (
                     <div className="ritual-row">
                       <p className="ritual-text">{item.question}</p>
-                      <button
-                        className={`ritual-btn no-print ${
-                          ritualDone ? 'done' : ''
-                        }`}
-                        onClick={() => setRitualDone(!ritualDone)}
-                      >
-                        {ritualDone ? '✓ Done' : 'Mark done'}
+                      <button className={`ritual-btn no-print ${ritualDone ? "done" : ""}`} onClick={() => setRitualDone(!ritualDone)}>
+                        {ritualDone ? "✓ Done" : "Mark done"}
                       </button>
                     </div>
                   )}
-                  {item.type === 'text' && (
+                  {item.type === "text" && (
                     <>
-                      <p className="q-prompt" style={{ marginBottom: 10 }}>
-                        {item.question}
-                      </p>
-                      <textarea
-                        className="field"
-                        placeholder={item.placeholder}
-                        value={weeklyAnswers[`q${i}`] || ''}
-                        onChange={(e) =>
-                          setWeeklyAnswers((prev) => ({
-                            ...prev,
-                            [`q${i}`]: e.target.value,
-                          }))
-                        }
-                      />
+                      <p className="q-prompt" style={{ marginBottom: 10 }}>{item.question}</p>
+                      <textarea className="field" placeholder={item.placeholder} value={weeklyAnswers[`q${i}`] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [`q${i}`]: e.target.value }))} />
                     </>
                   )}
-                  {item.type === 'big3' && (
+                  {item.type === "big3" && (
                     <>
-                      <p className="q-prompt" style={{ marginBottom: 12 }}>
-                        {item.question}
-                      </p>
+                      <p className="q-prompt" style={{ marginBottom: 12 }}>{item.question}</p>
                       <div className="big3-wrap">
                         {[0, 1, 2].map((j) => (
                           <div className="big3-row" key={j}>
                             <span className="big3-n">0{j + 1}</span>
-                            <input
-                              className="big3-input"
-                              placeholder={`Outcome ${j + 1} for this week...`}
-                              value={weeklyBig3[j]}
-                              onChange={(e) => {
-                                const u = [...weeklyBig3];
-                                u[j] = e.target.value;
-                                setWeeklyBig3(u);
-                              }}
-                            />
+                            <input className="big3-input" placeholder={`Outcome ${j + 1} for this week...`} value={weeklyBig3[j]} onChange={(e) => { const u = [...weeklyBig3]; u[j] = e.target.value; setWeeklyBig3(u); }} />
                           </div>
                         ))}
                       </div>
@@ -713,7 +440,7 @@ export default function PlanningSystem() {
         )}
 
         {/* DAILY */}
-        {tab === 'daily' && (
+        {tab === "daily" && (
           <div>
             <p className="daily-section-label">Morning</p>
             {DAILY_MORNING.map((block, i) => (
@@ -728,22 +455,7 @@ export default function PlanningSystem() {
                   {block.fields.map((f, j) => (
                     <div className="big3-row" key={j}>
                       <span className="big3-n">0{j + 1}</span>
-                      <input
-                        className="big3-input"
-                        placeholder={f}
-                        value={
-                          i === 0
-                            ? dailyMorning[`b${j + 1}`] || ''
-                            : dailyMorning[`t${j + 1}`] || ''
-                        }
-                        onChange={(e) => {
-                          const k = i === 0 ? `b${j + 1}` : `t${j + 1}`;
-                          setDailyMorning((prev) => ({
-                            ...prev,
-                            [k]: e.target.value,
-                          }));
-                        }}
-                      />
+                      <input className="big3-input" placeholder={f} value={i === 0 ? (dailyMorning[`b${j+1}`] || "") : (dailyMorning[`t${j+1}`] || "")} onChange={(e) => { const k = i === 0 ? `b${j+1}` : `t${j+1}`; setDailyMorning((prev) => ({ ...prev, [k]: e.target.value })); }} />
                     </div>
                   ))}
                 </div>
@@ -754,24 +466,12 @@ export default function PlanningSystem() {
             {DAILY_EVENING.map((block, i) => (
               <div className="daily-block" key={i}>
                 <div className="daily-top">
-                  <span className="daily-icon" style={{ color: '#4A2A7A' }}>
-                    {block.icon}
-                  </span>
+                  <span className="daily-icon" style={{ color: "#4A2A7A" }}>{block.icon}</span>
                   <span className="daily-title">{block.title}</span>
                 </div>
                 <p className="daily-prompt">{block.prompt}</p>
                 <p className="daily-instruction">{block.instruction}</p>
-                <textarea
-                  className="field field-sm"
-                  placeholder={block.placeholder}
-                  value={i === 0 ? dailyEvening.win : dailyEvening.adjust}
-                  onChange={(e) =>
-                    setDailyEvening((prev) => ({
-                      ...prev,
-                      [i === 0 ? 'win' : 'adjust']: e.target.value,
-                    }))
-                  }
-                />
+                <textarea className="field field-sm" placeholder={block.placeholder} value={i === 0 ? dailyEvening.win : dailyEvening.adjust} onChange={(e) => setDailyEvening((prev) => ({ ...prev, [i === 0 ? "win" : "adjust"]: e.target.value }))} />
               </div>
             ))}
           </div>
