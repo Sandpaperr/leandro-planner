@@ -77,7 +77,7 @@ export default function PlanningSystem() {
   const [weeklyAnswers, setWeeklyAnswers] = useState<Record<string, string>>({});
   const [weeklyBig3, setWeeklyBig3] = useState(["", "", ""]);
   const [ritualDone, setRitualDone] = useState(false);
-  const [dailyMorning, setDailyMorning] = useState({ b1: "", b2: "", b3: "", t1: "", t2: "", t3: "" });
+  const [dailyMorning, setDailyMorning] = useState<Record<string, string>>({ b1: "", b2: "", b3: "", t1: "", t2: "", t3: "" });
   const [dailyEvening, setDailyEvening] = useState({ win: "", adjust: "" });
   const [dateValue, setDateValue] = useState("");
 
@@ -348,13 +348,13 @@ export default function PlanningSystem() {
                 ))}
               </div>
 
-              {outcomes.map((o, oi) => (
+              {outcomes.map((o: Record<string, string>, oi: number) => (
                 <div key={oi} className={`outcome-block ${activeOutcome === oi ? "active" : ""}`}>
                   <div className="card">
                     <div className="card-body">
                       <div className="outcome-title-print">0{oi + 1} — {o.label || `Outcome ${oi + 1}`}</div>
 
-                      <input className={`outcome-label-input ${activeOutcome === oi ? "" : "no-print"}`} placeholder="Name this outcome area (e.g. Money, Body, Sabroso...)" value={o.label} onChange={(e) => updateOutcome(oi, "label", e.target.value)} />
+                      <input className={`outcome-label-input ${activeOutcome === oi ? "" : "no-print"}`} placeholder="Name this outcome area (e.g. Money, Body, Sabroso...)" value={(o.label ?? "") as string} onChange={(e) => updateOutcome(oi, "label", e.target.value)} />
 
                       <div className="sub-tabs no-print">
                         {QUARTERLY_EXERCISES[2].subSections.map((s) => (
@@ -365,7 +365,7 @@ export default function PlanningSystem() {
                       {QUARTERLY_EXERCISES[2].subSections.map((s) => (
                         <div key={s.key} className={`subsection-block ${activeSubSection === s.key ? "active" : ""}`}>
                           <p className="sub-prompt">{s.prompt}</p>
-                          <textarea className="field" style={{ minHeight: 80 }} placeholder={s.placeholder} value={o[s.key]} onChange={(e) => updateOutcome(oi, s.key, e.target.value)} />
+                          <textarea className="field" style={{ minHeight: 80 }} placeholder={s.placeholder} value={(o[s.key] ?? "") as string} onChange={(e) => updateOutcome(oi, s.key, e.target.value)} />
                         </div>
                       ))}
                     </div>
@@ -427,7 +427,7 @@ export default function PlanningSystem() {
                         {[0, 1, 2].map((j) => (
                           <div className="big3-row" key={j}>
                             <span className="big3-n">0{j + 1}</span>
-                            <input className="big3-input" placeholder={`Outcome ${j + 1} for this week...`} value={weeklyBig3[j]} onChange={(e) => { const u = [...weeklyBig3]; u[j] = e.target.value; setWeeklyBig3(u); }} />
+                            <input className="big3-input" placeholder={`Outcome ${j + 1} for this week...`} value={weeklyBig3[j] ?? ""} onChange={(e) => { const u = [...weeklyBig3]; u[j] = e.target.value; setWeeklyBig3(u); }} />
                           </div>
                         ))}
                       </div>
