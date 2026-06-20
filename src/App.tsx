@@ -1,4 +1,5 @@
 import { useState } from "react";
+import WheelChart from "./WheelChart";
 
 const WHEEL_DOMAINS = [
   "Mission", "Money", "Body", "Spirit", "Home & Environment",
@@ -147,6 +148,23 @@ export default function PlanningSystem() {
         .score-btn { width: 32px; height: 32px; flex: 1; min-width: 0; border: 1px solid var(--border); background: var(--ivory); border-radius: 3px; font-family: 'DM Mono', monospace; font-size: 10px; color: var(--ink-muted); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
         .score-btn.selected { background: var(--ink); border-color: var(--ink); color: var(--white); }
         .score-btn:hover:not(.selected) { border-color: var(--gold); color: var(--gold); }
+
+        /* SPIDER CHART */
+        .wheel-chart-wrap { margin-bottom: 8px; }
+        .wheel-chart-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+        .wheel-chart-hint { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-faint); }
+        .wheel-chart-avg { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-muted); white-space: nowrap; }
+        .wheel-chart-avg strong { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 600; color: var(--gold); margin-left: 4px; }
+        .wheel-chart-svg { display: block; width: 100%; height: auto; touch-action: none; -webkit-tap-highlight-color: transparent; }
+        .wheel-chart-svg text { transition: fill 0.15s; }
+
+        /* MANUAL SCORE FALLBACK */
+        .wheel-precise { margin-top: 20px; border-top: 1px solid var(--border-light); padding-top: 16px; }
+        .wheel-precise > summary { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); cursor: pointer; list-style: none; margin-bottom: 16px; transition: color 0.15s; }
+        .wheel-precise > summary::-webkit-details-marker { display: none; }
+        .wheel-precise > summary::before { content: '＋ '; color: var(--gold); }
+        .wheel-precise[open] > summary::before { content: '－ '; }
+        .wheel-precise > summary:hover { color: var(--gold); }
 
         /* QUESTIONS */
         .question-block { display: flex; flex-direction: column; gap: 16px; }
@@ -297,18 +315,28 @@ export default function PlanningSystem() {
                 </div>
                 <div className="card-body">
                   <p className="instruction">{QUARTERLY_EXERCISES[0].instruction}</p>
-                  <div className="wheel-grid">
-                    {WHEEL_DOMAINS.map((domain) => (
-                      <div className="wheel-item" key={domain}>
-                        <span className="wheel-label">{domain}</span>
-                        <div className="wheel-score-row">
-                          {[1,2,3,4,5,6,7,8,9,10].map((n) => (
-                            <button key={n} className={`score-btn ${scores[domain] === n ? "selected" : ""}`} onClick={() => setScores((prev) => ({ ...prev, [domain]: n }))}>{n}</button>
-                          ))}
+
+                  <WheelChart
+                    domains={WHEEL_DOMAINS}
+                    scores={scores}
+                    onChange={(domain, value) => setScores((prev) => ({ ...prev, [domain]: value }))}
+                  />
+
+                  <details className="wheel-precise no-print">
+                    <summary>Or set scores manually</summary>
+                    <div className="wheel-grid">
+                      {WHEEL_DOMAINS.map((domain) => (
+                        <div className="wheel-item" key={domain}>
+                          <span className="wheel-label">{domain}</span>
+                          <div className="wheel-score-row">
+                            {[1,2,3,4,5,6,7,8,9,10].map((n) => (
+                              <button key={n} className={`score-btn ${scores[domain] === n ? "selected" : ""}`} onClick={() => setScores((prev) => ({ ...prev, [domain]: n }))}>{n}</button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  </details>
                 </div>
               </div>
             </div>
