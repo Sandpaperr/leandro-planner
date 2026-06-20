@@ -17,6 +17,9 @@ const LEVELS = 10;
 
 const TAU = Math.PI * 2;
 
+// Scores below this are considered "below floor".
+export const FLOOR = 5;
+
 // Each domain gets an axis, starting at the top and going clockwise.
 function axisAngle(i: number, n: number) {
   return -Math.PI / 2 + (i / n) * TAU;
@@ -245,7 +248,7 @@ export default function WheelChart({ domains, scores, onChange }: WheelChartProp
                 cx={p.x}
                 cy={p.y}
                 r={active ? 9 : 6}
-                fill={active ? "#9A6E2A" : "#1A1714"}
+                fill={active ? "#9A6E2A" : s < FLOOR ? "#B0492F" : "#1A1714"}
                 stroke="#FFFFFF"
                 strokeWidth={2}
               />
@@ -256,7 +259,7 @@ export default function WheelChart({ domains, scores, onChange }: WheelChartProp
                   textAnchor="middle"
                   fontFamily="'DM Mono', monospace"
                   fontSize={11}
-                  fill="#9A6E2A"
+                  fill={s < FLOOR ? "#B0492F" : "#9A6E2A"}
                   fontWeight={500}
                 >
                   {s}
