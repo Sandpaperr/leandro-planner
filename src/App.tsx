@@ -42,14 +42,115 @@ const QUARTERLY_EXERCISES = [
   },
 ];
 
-const WEEKLY_QUESTIONS = [
-  { number: "01", question: "Read your 3 outcomes out loud with full intensity. Own them.", type: "ritual", label: "Opening Ritual" },
-  { number: "02", question: "Where did I show up fully last week? Where did I hold back?", type: "text", placeholder: "Be brutally honest...", label: "Honest Review" },
-  { number: "03", question: "What am I most proud of this week?", type: "text", placeholder: "Your biggest win...", label: "Best Moment" },
-  { number: "04", question: "What did I learn that I will use immediately?", type: "text", placeholder: "The insight that changes next week...", label: "Key Learning" },
-  { number: "05", question: "What does this week demand of me?", type: "text", placeholder: "Check your calendar. What is this week asking of you?", label: "This Week's Demand" },
-  { number: "06", question: "What 3 outcomes this week will move me closest to my vision?", type: "big3", label: "Weekly Big 3" },
-  { number: "07", question: "What is the single most important thing I will do first thing Monday morning?", type: "text", placeholder: "The one non-negotiable that starts the week right...", label: "Monday Anchor" },
+type WeeklyItem = {
+  number: string;
+  label: string;
+  type: "ritual" | "text" | "multi" | "wheel" | "big3";
+  question?: string;
+  instruction?: string;
+  placeholder?: string;
+  fieldSm?: boolean;
+  questions?: string[];
+};
+
+const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; items: WeeklyItem[] }> = [
+  {
+    phase: "Phase 01",
+    title: "Review",
+    time: "20 min",
+    items: [
+      {
+        number: "01",
+        label: "Opening Ritual",
+        type: "ritual",
+        question: "Read your 3 quarterly outcomes out loud. Full intensity. Own them.",
+      },
+      {
+        number: "02",
+        label: "Weekly Scorecard",
+        type: "multi",
+        questions: [
+          "Did I move the needle on each of my 3 this week?",
+          "What got in the way?",
+          "What would I do differently?",
+        ],
+      },
+      {
+        number: "03",
+        label: "Honest Reflection",
+        type: "multi",
+        questions: [
+          "What went well this week?",
+          "What could be improved?",
+          "What did I learn, and how will I use it next week?",
+        ],
+      },
+      {
+        number: "04",
+        label: "Wheel of Life Pulse",
+        type: "wheel",
+        instruction: "Quick 1-10 on each domain. First number, no overthinking.",
+        questions: [
+          "Which domains are below floor? (below 5 and declining)",
+          "Is anything low enough to cost me focus or energy next week?",
+        ],
+      },
+    ],
+  },
+  {
+    phase: "Phase 02",
+    title: "Design",
+    time: "30 min",
+    items: [
+      {
+        number: "05",
+        label: "The Year-Forward Question",
+        type: "text",
+        question: "A year from now, what would I wish I had done this week?",
+        instruction: "Answer this before touching anything else. It cuts through noise.",
+        placeholder: "A year from now, I'll be glad I...",
+      },
+      {
+        number: "06",
+        label: "Weekly Big 3",
+        type: "big3",
+        question: "Three moves, one per quarterly outcome.",
+        instruction: "Each one must be specific, completable, and scheduled before this session ends. Vague intentions don't count.",
+      },
+      {
+        number: "07",
+        label: "Floor Maintenance",
+        type: "text",
+        question: "Based on the Wheel pulse, what one or two things need a minimum viable action this week?",
+        instruction: "Not growth. Just enough to stay stable and protect your energy.",
+        placeholder: "The minimum viable actions that keep me stable...",
+      },
+      {
+        number: "08",
+        label: "Energy and Joy Plan",
+        type: "text",
+        question: "What will fill my tank this week? (movement, people, music, dancing, something new)",
+        instruction: "This is not optional. Name it specifically. When is it happening?",
+        placeholder: "What fills my tank, and exactly when it happens...",
+      },
+      {
+        number: "09",
+        label: "One Thing to Look Forward To",
+        type: "text",
+        question: "Something concrete in the next 7 days that genuinely excites you.",
+        instruction: "If it doesn't exist yet, create it now. Text someone, book something, plan it before closing this session.",
+        placeholder: "I'm looking forward to...",
+      },
+      {
+        number: "10",
+        label: "Closing Intention",
+        type: "text",
+        question: "One sentence. Sunday night, looking back: what would make this a week worth living?",
+        placeholder: "This was a week worth living because...",
+        fieldSm: true,
+      },
+    ],
+  },
 ];
 
 const DAILY_MORNING = [
@@ -76,6 +177,7 @@ export default function PlanningSystem() {
   const [activeSubSection, setActiveSubSection] = useState("result");
   const [sacrificeAnswers, setSacrificeAnswers] = useState<Record<string, string>>({});
   const [weeklyAnswers, setWeeklyAnswers] = useState<Record<string, string>>({});
+  const [weeklyScores, setWeeklyScores] = useState<Record<string, number>>({});
   const [weeklyBig3, setWeeklyBig3] = useState(["", "", ""]);
   const [ritualDone, setRitualDone] = useState(false);
   const [dailyMorning, setDailyMorning] = useState<Record<string, string>>({ b1: "", b2: "", b3: "", t1: "", t2: "", t3: "" });
@@ -219,6 +321,16 @@ export default function PlanningSystem() {
         .big3-n { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--gold); flex-shrink: 0; }
         .big3-input { border: none; background: none; font-family: 'Lato', sans-serif; font-size: 15px; color: var(--ink); flex: 1; outline: none; }
         .big3-input::placeholder { color: var(--ink-faint); font-style: italic; }
+
+        /* PHASE HEADER (WEEKLY) */
+        .phase-header { display: flex; align-items: baseline; gap: 14px; margin-top: 36px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+        .phase-header:first-of-type { margin-top: 0; }
+        .phase-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); }
+        .phase-title { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 600; color: var(--ink); flex: 1; }
+        .phase-time { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink-faint); }
+
+        /* SECONDARY NOTE UNDER A PROMPT */
+        .q-note { font-family: 'Lato', sans-serif; font-size: 13px; font-style: italic; color: var(--ink-muted); line-height: 1.5; margin-bottom: 10px; }
 
         /* DAILY */
         .daily-section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--border-light); }
@@ -426,41 +538,87 @@ export default function PlanningSystem() {
 
         {/* WEEKLY */}
         {tab === "weekly" && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {WEEKLY_QUESTIONS.map((item, i) => (
-              <div className="card" key={i}>
-                <div className="card-header">
-                  <span className="card-num">{item.number}</span>
-                  <span className="card-label">{item.label}</span>
+          <div>
+            {WEEKLY_PHASES.map((phase) => (
+              <div key={phase.phase}>
+                <div className="phase-header">
+                  <span className="phase-eyebrow">{phase.phase}</span>
+                  <span className="phase-title">{phase.title}</span>
+                  <span className="phase-time">{phase.time}</span>
                 </div>
-                <div className="card-body">
-                  {item.type === "ritual" && (
-                    <div className="ritual-row">
-                      <p className="ritual-text">{item.question}</p>
-                      <button className={`ritual-btn no-print ${ritualDone ? "done" : ""}`} onClick={() => setRitualDone(!ritualDone)}>
-                        {ritualDone ? "✓ Done" : "Mark done"}
-                      </button>
-                    </div>
-                  )}
-                  {item.type === "text" && (
-                    <>
-                      <p className="q-prompt" style={{ marginBottom: 10 }}>{item.question}</p>
-                      <textarea className="field" placeholder={item.placeholder} value={weeklyAnswers[`q${i}`] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [`q${i}`]: e.target.value }))} />
-                    </>
-                  )}
-                  {item.type === "big3" && (
-                    <>
-                      <p className="q-prompt" style={{ marginBottom: 12 }}>{item.question}</p>
-                      <div className="big3-wrap">
-                        {[0, 1, 2].map((j) => (
-                          <div className="big3-row" key={j}>
-                            <span className="big3-n">0{j + 1}</span>
-                            <input className="big3-input" placeholder={`Outcome ${j + 1} for this week...`} value={weeklyBig3[j] ?? ""} onChange={(e) => { const u = [...weeklyBig3]; u[j] = e.target.value; setWeeklyBig3(u); }} />
-                          </div>
-                        ))}
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 8 }}>
+                  {phase.items.map((item) => (
+                    <div className="card" key={item.number}>
+                      <div className="card-header">
+                        <span className="card-num">{item.number}</span>
+                        <span className="card-label">{item.label}</span>
                       </div>
-                    </>
-                  )}
+                      <div className="card-body">
+                        {item.type === "ritual" && (
+                          <div className="ritual-row">
+                            <p className="ritual-text">{item.question}</p>
+                            <button className={`ritual-btn no-print ${ritualDone ? "done" : ""}`} onClick={() => setRitualDone(!ritualDone)}>
+                              {ritualDone ? "✓ Done" : "Mark done"}
+                            </button>
+                          </div>
+                        )}
+
+                        {item.type === "text" && (
+                          <>
+                            <p className="q-prompt" style={{ marginBottom: item.instruction ? 4 : 10 }}>{item.question}</p>
+                            {item.instruction && <p className="q-note">{item.instruction}</p>}
+                            <textarea className={`field ${item.fieldSm ? "field-sm" : ""}`} placeholder={item.placeholder} value={weeklyAnswers[item.number] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [item.number]: e.target.value }))} />
+                          </>
+                        )}
+
+                        {item.type === "multi" && (
+                          <div className="question-block">
+                            {item.questions!.map((q, qi) => (
+                              <div className="q-item" key={qi}>
+                                <p className="q-prompt">{q}</p>
+                                <textarea className="field field-sm" placeholder="Write your answer..." value={weeklyAnswers[`${item.number}-${qi}`] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [`${item.number}-${qi}`]: e.target.value }))} />
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {item.type === "wheel" && (
+                          <>
+                            <p className="instruction">{item.instruction}</p>
+                            <WheelChart
+                              domains={WHEEL_DOMAINS}
+                              scores={weeklyScores}
+                              onChange={(domain, value) => setWeeklyScores((prev) => ({ ...prev, [domain]: value }))}
+                            />
+                            <div className="question-block" style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border-light)" }}>
+                              {item.questions!.map((q, qi) => (
+                                <div className="q-item" key={qi}>
+                                  <p className="q-prompt">{q}</p>
+                                  <textarea className="field field-sm" placeholder="Write your answer..." value={weeklyAnswers[`${item.number}-${qi}`] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [`${item.number}-${qi}`]: e.target.value }))} />
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+
+                        {item.type === "big3" && (
+                          <>
+                            <p className="q-prompt" style={{ marginBottom: item.instruction ? 4 : 12 }}>{item.question}</p>
+                            {item.instruction && <p className="q-note" style={{ marginBottom: 12 }}>{item.instruction}</p>}
+                            <div className="big3-wrap">
+                              {[0, 1, 2].map((j) => (
+                                <div className="big3-row" key={j}>
+                                  <span className="big3-n">0{j + 1}</span>
+                                  <input className="big3-input" placeholder={`Move ${j + 1} — one per quarterly outcome...`} value={weeklyBig3[j] ?? ""} onChange={(e) => { const u = [...weeklyBig3]; u[j] = e.target.value; setWeeklyBig3(u); }} />
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
