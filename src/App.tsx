@@ -315,7 +315,7 @@ const DAILY_EVENING = [
 ];
 
 export default function PlanningSystem() {
-  const [tab, setTab] = useState("quarterly");
+  const [tab, setTab] = useState("daily");
   const [scores, setScores] = useState<Record<string, number>>({});
   const [quarterlyAnswers, setQuarterlyAnswers] = useState<Record<string, string>>({});
   const [quarterlyRituals, setQuarterlyRituals] = useState<Record<string, boolean>>({});
@@ -540,7 +540,7 @@ export default function PlanningSystem() {
 
         <div className="tab-bar no-print">
           <div className="main-tabs">
-            {[{ id: "quarterly", label: "Quarterly" }, { id: "weekly", label: "Weekly" }, { id: "daily", label: "Daily" }].map((t) => (
+            {[{ id: "daily", label: "Daily" }, { id: "weekly", label: "Weekly" }, { id: "quarterly", label: "Quarterly" }].map((t) => (
               <button key={t.id} className={`main-tab ${tab === t.id ? "on" : ""}`} onClick={() => setTab(t.id)}>
                 {t.label}
               </button>
