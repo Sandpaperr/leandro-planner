@@ -1,5 +1,5 @@
 import { useState } from "react";
-import WheelChart from "./WheelChart";
+import WheelChart, { FLOOR } from "./WheelChart";
 
 const WHEEL_DOMAINS = [
   "Mission", "Money", "Body", "Spirit", "Home & Environment",
@@ -332,6 +332,13 @@ export default function PlanningSystem() {
         /* SECONDARY NOTE UNDER A PROMPT */
         .q-note { font-family: 'Lato', sans-serif; font-size: 13px; font-style: italic; color: var(--ink-muted); line-height: 1.5; margin-bottom: 10px; }
 
+        /* AUTO-DETECTED BELOW-FLOOR DOMAINS */
+        .floor-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .floor-chip { display: inline-flex; align-items: center; gap: 7px; background: #FBEEEA; border: 1px solid #E3BFB4; border-radius: 999px; padding: 5px 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; color: #B0492F; }
+        .floor-chip strong { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; }
+        .floor-ok { font-family: 'Lato', sans-serif; font-size: 14px; color: #2A6E5A; margin-bottom: 12px; }
+        .floor-empty { font-family: 'Lato', sans-serif; font-size: 13px; font-style: italic; color: var(--ink-faint); margin-bottom: 12px; }
+
         /* DAILY */
         .daily-section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gold); margin-bottom: 14px; margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--border-light); }
         .daily-section-label:first-of-type { margin-top: 0; border-top: none; padding-top: 0; }
@@ -583,24 +590,49 @@ export default function PlanningSystem() {
                           </div>
                         )}
 
-                        {item.type === "wheel" && (
-                          <>
-                            <p className="instruction">{item.instruction}</p>
-                            <WheelChart
-                              domains={WHEEL_DOMAINS}
-                              scores={weeklyScores}
-                              onChange={(domain, value) => setWeeklyScores((prev) => ({ ...prev, [domain]: value }))}
-                            />
-                            <div className="question-block" style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border-light)" }}>
-                              {item.questions!.map((q, qi) => (
-                                <div className="q-item" key={qi}>
-                                  <p className="q-prompt">{q}</p>
-                                  <textarea className="field field-sm" placeholder="Write your answer..." value={weeklyAnswers[`${item.number}-${qi}`] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [`${item.number}-${qi}`]: e.target.value }))} />
+                        {item.type === "wheel" && (() => {
+                          const anyScored = WHEEL_DOMAINS.some((d) => weeklyScores[d]);
+                          const belowFloor = WHEEL_DOMAINS.filter((d) => weeklyScores[d] && weeklyScores[d] < FLOOR);
+                          return (
+                            <>
+                              <p className="instruction">{item.instruction}</p>
+                              <WheelChart
+                                domains={WHEEL_DOMAINS}
+                                scores={weeklyScores}
+                                onChange={(domain, value) => setWeeklyScores((prev) => ({ ...prev, [domain]: value }))}
+                              />
+                              <div className="question-block" style={{ marginTop: 20, paddingTop: 16, borderTop: "1px solid var(--border-light)" }}>
+                                {/* Auto-detected below-floor domains */}
+                                <div className="q-item">
+                                  <p className="q-prompt">{item.questions![0]}</p>
+                                  {!anyScored ? (
+                                    <p className="floor-empty">Score the wheel above — anything below {FLOOR} will surface here automatically.</p>
+                                  ) : belowFloor.length === 0 ? (
+                                    <p className="floor-ok">✓ Nothing below floor. Every scored domain is {FLOOR} or above.</p>
+                                  ) : (
+                                    <div className="floor-chips">
+                                      {belowFloor
+                                        .sort((a, b) => weeklyScores[a] - weeklyScores[b])
+                                        .map((d) => (
+                                          <span className="floor-chip" key={d}>
+                                            {d} <strong>{weeklyScores[d]}</strong>
+                                          </span>
+                                        ))}
+                                    </div>
+                                  )}
+                                  <textarea className="field field-sm" placeholder="Of these, which are also declining? Note anything worth tracking..." value={weeklyAnswers[`${item.number}-0`] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [`${item.number}-0`]: e.target.value }))} />
                                 </div>
-                              ))}
-                            </div>
-                          </>
-                        )}
+                                {/* Remaining questions */}
+                                {item.questions!.slice(1).map((q, qi) => (
+                                  <div className="q-item" key={qi + 1}>
+                                    <p className="q-prompt">{q}</p>
+                                    <textarea className="field field-sm" placeholder="Write your answer..." value={weeklyAnswers[`${item.number}-${qi + 1}`] || ""} onChange={(e) => setWeeklyAnswers((prev) => ({ ...prev, [`${item.number}-${qi + 1}`]: e.target.value }))} />
+                                  </div>
+                                ))}
+                              </div>
+                            </>
+                          );
+                        })()}
 
                         {item.type === "big3" && (
                           <>
