@@ -6,38 +6,189 @@ const WHEEL_DOMAINS = [
   "Growth", "Romance", "Family & Friends", "Fun", "Communities"
 ];
 
-const QUARTERLY_EXERCISES = [
+const OUTCOME_SECTIONS = [
+  { key: "result", label: "Result", prompt: "What is the specific outcome? Write it as already done, present tense, emotionally charged.", placeholder: "I am... I have... I feel..." },
+  { key: "purpose", label: "Purpose", prompt: "Why does this have to happen? What does it mean for your life, your freedom, your identity?", placeholder: "This matters because..." },
+  { key: "map", label: "Massive Action Plan", prompt: "What are the 3 to 5 actions that will make this outcome inevitable?", placeholder: "The actions that move the needle..." },
+  { key: "obstacles", label: "Obstacles", prompt: "What are the 2 to 3 things most likely to derail this? Name them now so they don't catch you off guard.", placeholder: "The things that will try to stop me..." },
+  { key: "identity", label: "Identity", prompt: "Who do you need to become for this to be inevitable? Not what you need to do. Who you need to be.", placeholder: "I am someone who..." },
+];
+
+type QuarterlyItem = {
+  number: string;
+  label: string;
+  type: "ritual" | "text" | "multi" | "wheel" | "cost" | "outcomes" | "declaration";
+  question?: string;
+  instruction?: string;
+  placeholder?: string;
+  questions?: string[];
+};
+
+// Scores below this leave a domain "in the red" for the quarterly cost question.
+const COST_THRESHOLD = 6;
+
+const QUARTERLY_PARTS: Array<{ part: string; title: string; time: string; items: QuarterlyItem[] }> = [
   {
-    id: "wheel",
-    label: "Wheel of Life",
-    instruction: "Rate yourself honestly from 1 to 10 in each area. First number that comes to mind. No overthinking.",
-  },
-  {
-    id: "gaps",
-    label: "Identify the Gaps",
-    questions: [
-      "Which 3 areas scored lowest?",
-      "Which gap, if closed, would have the biggest impact on everything else?",
+    part: "Part 01",
+    title: "Enter the State",
+    time: "15–20 min",
+    items: [
+      {
+        number: "01",
+        label: "Pre-Session Ritual",
+        type: "ritual",
+        question: "Movement, music, something physical that shifts your state before you sit down. This happens before you open the app.",
+      },
+      {
+        number: "02",
+        label: "Evidence Review",
+        type: "ritual",
+        question: "Before you write anything, go through your last 90 days of photos, stories, calendar, and messages. Let the evidence remind you what actually happened. You lived more than you remember.",
+      },
+      {
+        number: "03",
+        label: "Gratitude Flood",
+        type: "text",
+        question: "Now that you've seen it — what are you genuinely proud of? What moments, wins, connections, growth?",
+        instruction: "Go wide. Nothing is too small. The goal is to feel the evidence of your own momentum before you assess anything.",
+        placeholder: "I'm proud of...",
+      },
+      {
+        number: "04",
+        label: "Acknowledgement",
+        type: "text",
+        question: "What did you do this quarter that was hard? What did it cost you, and what did it take to push through?",
+        placeholder: "What was hard, what it cost, what it took...",
+      },
     ],
   },
   {
-    id: "outcomes",
-    label: "Define Your 3 Outcomes",
-    instruction: "For each of your 3 focus areas, answer all 5 questions. Write in present tense, as if it has already happened.",
-    subSections: [
-      { key: "result", label: "Result", prompt: "What is the specific outcome? Write it as already done, present tense, emotionally charged.", placeholder: "I am... I have... I feel..." },
-      { key: "purpose", label: "Purpose", prompt: "Why does this have to happen? What does it mean for your life, your freedom, your identity?", placeholder: "This matters because..." },
-      { key: "map", label: "Massive Action Plan", prompt: "What are the 3 to 5 actions that will make this outcome inevitable?", placeholder: "The actions that move the needle..." },
-      { key: "obstacles", label: "Obstacles", prompt: "What are the 2 to 3 things most likely to derail this? Name them now so they don't catch you off guard.", placeholder: "The things that will try to stop me..." },
-      { key: "identity", label: "Identity", prompt: "Who do you need to become for this to be inevitable? Not what you need to do. Who you need to be.", placeholder: "I am someone who..." },
+    part: "Part 02",
+    title: "Honest Look Back",
+    time: "20 min",
+    items: [
+      {
+        number: "05",
+        label: "Last Quarter Scorecard",
+        type: "multi",
+        questions: [
+          "What were your 3 outcomes?",
+          "Did you hit them?",
+          "What worked, what didn't, what surprised you?",
+        ],
+      },
+      {
+        number: "06",
+        label: "Wheel of Life",
+        type: "wheel",
+        instruction: "Full honest score across all 10 domains. First number, no overthinking.",
+      },
+      {
+        number: "07",
+        label: "The Cost Question",
+        type: "cost",
+        question: "For each domain below 6: what has staying here cost you? And what will another 90 days at this level cost you?",
+      },
+      {
+        number: "08",
+        label: "The Real Question",
+        type: "text",
+        question: "Looking at this honestly, where are you lying to yourself?",
+        placeholder: "The truth I've been avoiding...",
+      },
     ],
   },
   {
-    id: "sacrifice",
-    label: "What You Will Give Up",
-    questions: [
-      "What behaviour, habit, or commitment has to stop for these 3 outcomes to happen?",
-      "What will you say no to this quarter that you would normally say yes to?",
+    part: "Part 03",
+    title: "Pull Forward",
+    time: "20 min",
+    items: [
+      {
+        number: "09",
+        label: "The 1-Year Vision",
+        type: "text",
+        question: "If the next 12 months go exactly as you want, what is true?",
+        instruction: "Be specific. Supercycle, Sabroso, body, relationships, experiences, who you've become. Write it as already done, present tense, emotionally charged.",
+        placeholder: "A year from now, it's true that...",
+      },
+      {
+        number: "10",
+        label: "The 90-Day Slice",
+        type: "text",
+        question: "Of that 1-year vision, what portion is achievable and right to pursue in the next 90 days? What does winning this quarter look like, specifically?",
+        placeholder: "Winning this quarter looks like...",
+      },
+      {
+        number: "11",
+        label: "The Feeling Question",
+        type: "text",
+        question: "When this quarter is done and you've hit your outcomes, how do you feel? What are you saying to yourself?",
+        instruction: "Name it. This is your emotional target, not just your logical one.",
+        placeholder: "I feel... I'm saying to myself...",
+      },
+    ],
+  },
+  {
+    part: "Part 04",
+    title: "Define the 3",
+    time: "25 min",
+    items: [
+      {
+        number: "12",
+        label: "Identify the Right 3",
+        type: "text",
+        question: "Using the cost analysis and the vision, what are the 3 outcomes that matter most this quarter?",
+        instruction: "Not the most urgent. The highest leverage. The ones that make you feel something.",
+        placeholder: "The 3 that matter most...",
+      },
+      {
+        number: "13",
+        label: "Your 3 Outcomes",
+        type: "outcomes",
+        instruction: "For each of your 3 focus areas, answer all 5 questions. Write in present tense, as if it has already happened.",
+      },
+      {
+        number: "14",
+        label: "The Constraint Question",
+        type: "text",
+        question: "What is the single biggest thing standing between you and all 3 of these? If you removed it, how much faster does everything move?",
+        placeholder: "The one constraint that's holding everything back...",
+      },
+    ],
+  },
+  {
+    part: "Part 05",
+    title: "Commitment",
+    time: "15 min",
+    items: [
+      {
+        number: "15",
+        label: "What You Will Give Up",
+        type: "text",
+        question: "What behaviour, habit, or pattern has to stop for these 3 to happen?",
+        placeholder: "I'm giving up...",
+      },
+      {
+        number: "16",
+        label: "What You Will Protect",
+        type: "text",
+        question: "What non-negotiables stay in place regardless of how busy it gets?",
+        instruction: "For you: training, dance, connection, sleep.",
+        placeholder: "I protect, no matter what...",
+      },
+      {
+        number: "17",
+        label: "The Cost of Not Doing This",
+        type: "text",
+        question: "Be specific. A year from now, if you didn't pursue these 3, what does that life look like? Feel like?",
+        placeholder: "If I don't pursue these, a year from now...",
+      },
+      {
+        number: "18",
+        label: "Closing Declaration",
+        type: "declaration",
+        question: "One sentence per outcome, spoken out loud. Present tense. Full intensity.",
+      },
     ],
   },
 ];
@@ -165,9 +316,10 @@ const DAILY_EVENING = [
 
 export default function PlanningSystem() {
   const [tab, setTab] = useState("quarterly");
-  const [quarterlyStep, setQuarterlyStep] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({});
-  const [gapAnswers, setGapAnswers] = useState<Record<string, string>>({});
+  const [quarterlyAnswers, setQuarterlyAnswers] = useState<Record<string, string>>({});
+  const [quarterlyRituals, setQuarterlyRituals] = useState<Record<string, boolean>>({});
+  const [costAnswers, setCostAnswers] = useState<Record<string, string>>({});
   const [outcomes, setOutcomes] = useState<Array<Record<string, string>>>([
     { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
     { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
@@ -175,7 +327,6 @@ export default function PlanningSystem() {
   ]);
   const [activeOutcome, setActiveOutcome] = useState(0);
   const [activeSubSection, setActiveSubSection] = useState("result");
-  const [sacrificeAnswers, setSacrificeAnswers] = useState<Record<string, string>>({});
   const [weeklyAnswers, setWeeklyAnswers] = useState<Record<string, string>>({});
   const [weeklyScores, setWeeklyScores] = useState<Record<string, number>>({});
   const [weeklyBig3, setWeeklyBig3] = useState(["", "", ""]);
@@ -187,8 +338,6 @@ export default function PlanningSystem() {
   const updateOutcome = (idx: number, field: string, value: string) => {
     setOutcomes((prev) => prev.map((o, i) => i === idx ? { ...o, [field]: value } : o));
   };
-
-  const steps = QUARTERLY_EXERCISES;
 
   return (
     <div style={{ background: "#F7F3EC", minHeight: "100vh" }}>
@@ -417,129 +566,161 @@ export default function PlanningSystem() {
         {/* QUARTERLY */}
         {tab === "quarterly" && (
           <div>
-            <div className="step-nav no-print">
-              {steps.map((s, i) => (
-                <button key={s.id} className={`step-btn ${quarterlyStep === i ? "on" : ""}`} onClick={() => setQuarterlyStep(i)}>
-                  {s.label}
-                </button>
-              ))}
-            </div>
-
-            {/* WHEEL */}
-            <div className={`q-section ${quarterlyStep === 0 ? "active" : ""}`}>
-              <div className="card">
-                <div className="card-header">
-                  <span className="card-label">Step 01</span>
-                  <span className="card-title">Wheel of Life</span>
+            {QUARTERLY_PARTS.map((part) => (
+              <div key={part.part}>
+                <div className="phase-header">
+                  <span className="phase-eyebrow">{part.part}</span>
+                  <span className="phase-title">{part.title}</span>
+                  <span className="phase-time">{part.time}</span>
                 </div>
-                <div className="card-body">
-                  <p className="instruction">{QUARTERLY_EXERCISES[0].instruction}</p>
 
-                  <WheelChart
-                    domains={WHEEL_DOMAINS}
-                    scores={scores}
-                    onChange={(domain, value) => setScores((prev) => ({ ...prev, [domain]: value }))}
-                  />
+                <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 8 }}>
+                  {part.items.map((item) => (
+                    <div className="card" key={item.number}>
+                      <div className="card-header">
+                        <span className="card-num">{item.number}</span>
+                        <span className="card-label">{item.label}</span>
+                      </div>
+                      <div className="card-body">
+                        {item.type === "ritual" && (
+                          <div className="ritual-row">
+                            <p className="ritual-text">{item.question}</p>
+                            <button className={`ritual-btn no-print ${quarterlyRituals[item.number] ? "done" : ""}`} onClick={() => setQuarterlyRituals((prev) => ({ ...prev, [item.number]: !prev[item.number] }))}>
+                              {quarterlyRituals[item.number] ? "✓ Done" : "Mark done"}
+                            </button>
+                          </div>
+                        )}
 
-                  <details className="wheel-precise no-print">
-                    <summary>Or set scores manually</summary>
-                    <div className="wheel-grid">
-                      {WHEEL_DOMAINS.map((domain) => (
-                        <div className="wheel-item" key={domain}>
-                          <span className="wheel-label">{domain}</span>
-                          <div className="wheel-score-row">
-                            {[1,2,3,4,5,6,7,8,9,10].map((n) => (
-                              <button key={n} className={`score-btn ${scores[domain] === n ? "selected" : ""}`} onClick={() => setScores((prev) => ({ ...prev, [domain]: n }))}>{n}</button>
+                        {item.type === "text" && (
+                          <>
+                            <p className="q-prompt" style={{ marginBottom: item.instruction ? 4 : 10 }}>{item.question}</p>
+                            {item.instruction && <p className="q-note">{item.instruction}</p>}
+                            <textarea className="field" placeholder={item.placeholder} value={quarterlyAnswers[item.number] || ""} onChange={(e) => setQuarterlyAnswers((prev) => ({ ...prev, [item.number]: e.target.value }))} />
+                          </>
+                        )}
+
+                        {item.type === "multi" && (
+                          <div className="question-block">
+                            {item.questions!.map((q, qi) => (
+                              <div className="q-item" key={qi}>
+                                <p className="q-prompt">{q}</p>
+                                <textarea className="field field-sm" placeholder="Write your answer..." value={quarterlyAnswers[`${item.number}-${qi}`] || ""} onChange={(e) => setQuarterlyAnswers((prev) => ({ ...prev, [`${item.number}-${qi}`]: e.target.value }))} />
+                              </div>
                             ))}
                           </div>
-                        </div>
-                      ))}
+                        )}
+
+                        {item.type === "wheel" && (
+                          <>
+                            <p className="instruction">{item.instruction}</p>
+                            <WheelChart
+                              domains={WHEEL_DOMAINS}
+                              scores={scores}
+                              onChange={(domain, value) => setScores((prev) => ({ ...prev, [domain]: value }))}
+                            />
+                            <details className="wheel-precise no-print">
+                              <summary>Or set scores manually</summary>
+                              <div className="wheel-grid">
+                                {WHEEL_DOMAINS.map((domain) => (
+                                  <div className="wheel-item" key={domain}>
+                                    <span className="wheel-label">{domain}</span>
+                                    <div className="wheel-score-row">
+                                      {[1,2,3,4,5,6,7,8,9,10].map((n) => (
+                                        <button key={n} className={`score-btn ${scores[domain] === n ? "selected" : ""}`} onClick={() => setScores((prev) => ({ ...prev, [domain]: n }))}>{n}</button>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </details>
+                          </>
+                        )}
+
+                        {item.type === "cost" && (() => {
+                          const anyScored = WHEEL_DOMAINS.some((d) => scores[d]);
+                          const inRed = WHEEL_DOMAINS.filter((d) => scores[d] && scores[d] < COST_THRESHOLD);
+                          return (
+                            <>
+                              <p className="q-prompt" style={{ marginBottom: 12 }}>{item.question}</p>
+                              {!anyScored ? (
+                                <p className="floor-empty">Score the Wheel of Life above — domains under {COST_THRESHOLD} will appear here automatically.</p>
+                              ) : inRed.length === 0 ? (
+                                <p className="floor-ok">✓ No domain is below {COST_THRESHOLD}. Nothing in the red this quarter.</p>
+                              ) : (
+                                <div className="question-block">
+                                  {inRed
+                                    .sort((a, b) => scores[a] - scores[b])
+                                    .map((d) => (
+                                      <div className="q-item" key={d}>
+                                        <p className="q-prompt cost-domain">
+                                          <span className="floor-chip">{d} <strong>{scores[d]}</strong></span>
+                                        </p>
+                                        <textarea className="field field-sm" placeholder="What has staying here cost you — and what will another 90 days at this level cost?" value={costAnswers[d] || ""} onChange={(e) => setCostAnswers((prev) => ({ ...prev, [d]: e.target.value }))} />
+                                      </div>
+                                    ))}
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
+
+                        {item.type === "outcomes" && (
+                          <>
+                            {item.instruction && (
+                              <p className="instruction no-print" style={{ fontStyle: "italic" }}>{item.instruction}</p>
+                            )}
+
+                            <div className="outcome-tabs no-print">
+                              {outcomes.map((o, i) => (
+                                <div key={i} className={`outcome-tab ${activeOutcome === i ? "on" : ""}`} onClick={() => { setActiveOutcome(i); setActiveSubSection("result"); }}>
+                                  <span className="outcome-tab-n">0{i + 1}</span>
+                                  <span className="outcome-tab-name">{o.label || `Outcome ${i + 1}`}</span>
+                                </div>
+                              ))}
+                            </div>
+
+                            {outcomes.map((o: Record<string, string>, oi: number) => (
+                              <div key={oi} className={`outcome-block ${activeOutcome === oi ? "active" : ""}`}>
+                                <div className="outcome-title-print">0{oi + 1} — {o.label || `Outcome ${oi + 1}`}</div>
+
+                                <input className={`outcome-label-input ${activeOutcome === oi ? "" : "no-print"}`} placeholder="Name this outcome area (e.g. Money, Body, Sabroso...)" value={(o.label ?? "") as string} onChange={(e) => updateOutcome(oi, "label", e.target.value)} />
+
+                                <div className="sub-tabs no-print">
+                                  {OUTCOME_SECTIONS.map((s) => (
+                                    <button key={s.key} className={`sub-tab ${activeSubSection === s.key ? "on" : ""}`} onClick={() => setActiveSubSection(s.key)}>{s.label}</button>
+                                  ))}
+                                </div>
+
+                                {OUTCOME_SECTIONS.map((s) => (
+                                  <div key={s.key} className={`subsection-block ${activeSubSection === s.key ? "active" : ""}`}>
+                                    <p className="sub-prompt">{s.prompt}</p>
+                                    <textarea className="field" style={{ minHeight: 80 }} placeholder={s.placeholder} value={(o[s.key] ?? "") as string} onChange={(e) => updateOutcome(oi, s.key, e.target.value)} />
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </>
+                        )}
+
+                        {item.type === "declaration" && (
+                          <>
+                            <p className="q-prompt" style={{ marginBottom: 12 }}>{item.question}</p>
+                            <div className="big3-wrap">
+                              {[0, 1, 2].map((j) => (
+                                <div className="big3-row" key={j}>
+                                  <span className="big3-n">0{j + 1}</span>
+                                  <input className="big3-input" placeholder={outcomes[j]?.label ? `${outcomes[j].label} — declared in present tense...` : `Outcome ${j + 1} — declared in present tense...`} value={quarterlyAnswers[`${item.number}-${j}`] || ""} onChange={(e) => setQuarterlyAnswers((prev) => ({ ...prev, [`${item.number}-${j}`]: e.target.value }))} />
+                                </div>
+                              ))}
+                            </div>
+                          </>
+                        )}
+                      </div>
                     </div>
-                  </details>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            {/* GAPS */}
-            <div className={`q-section ${quarterlyStep === 1 ? "active" : ""}`}>
-              <div className="card">
-                <div className="card-header">
-                  <span className="card-label">Step 02</span>
-                  <span className="card-title">Identify the Gaps</span>
-                </div>
-                <div className="card-body">
-                  <div className="question-block">
-                    {QUARTERLY_EXERCISES[1].questions.map((q, i) => (
-                      <div className="q-item" key={i}>
-                        <p className="q-prompt">{q}</p>
-                        <textarea className="field field-sm" placeholder="Write your answer..." value={gapAnswers[`q${i}`] || ""} onChange={(e) => setGapAnswers((prev) => ({ ...prev, [`q${i}`]: e.target.value }))} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* OUTCOMES */}
-            <div className={`q-section ${quarterlyStep === 2 ? "active" : ""}`}>
-              <p className="instruction no-print" style={{ marginBottom: 16, fontFamily: "'Lato', sans-serif", fontSize: 15, fontStyle: "italic", color: "var(--ink-muted)" }}>
-                {QUARTERLY_EXERCISES[2].instruction}
-              </p>
-
-              <div className="outcome-tabs no-print">
-                {outcomes.map((o, i) => (
-                  <div key={i} className={`outcome-tab ${activeOutcome === i ? "on" : ""}`} onClick={() => { setActiveOutcome(i); setActiveSubSection("result"); }}>
-                    <span className="outcome-tab-n">0{i + 1}</span>
-                    <span className="outcome-tab-name">{o.label || `Outcome ${i + 1}`}</span>
-                  </div>
-                ))}
-              </div>
-
-              {outcomes.map((o: Record<string, string>, oi: number) => (
-                <div key={oi} className={`outcome-block ${activeOutcome === oi ? "active" : ""}`}>
-                  <div className="card">
-                    <div className="card-body">
-                      <div className="outcome-title-print">0{oi + 1} — {o.label || `Outcome ${oi + 1}`}</div>
-
-                      <input className={`outcome-label-input ${activeOutcome === oi ? "" : "no-print"}`} placeholder="Name this outcome area (e.g. Money, Body, Sabroso...)" value={(o.label ?? "") as string} onChange={(e) => updateOutcome(oi, "label", e.target.value)} />
-
-                      <div className="sub-tabs no-print">
-                        {QUARTERLY_EXERCISES[2].subSections.map((s) => (
-                          <button key={s.key} className={`sub-tab ${activeSubSection === s.key ? "on" : ""}`} onClick={() => setActiveSubSection(s.key)}>{s.label}</button>
-                        ))}
-                      </div>
-
-                      {QUARTERLY_EXERCISES[2].subSections.map((s) => (
-                        <div key={s.key} className={`subsection-block ${activeSubSection === s.key ? "active" : ""}`}>
-                          <p className="sub-prompt">{s.prompt}</p>
-                          <textarea className="field" style={{ minHeight: 80 }} placeholder={s.placeholder} value={(o[s.key] ?? "") as string} onChange={(e) => updateOutcome(oi, s.key, e.target.value)} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* SACRIFICE */}
-            <div className={`q-section ${quarterlyStep === 3 ? "active" : ""}`}>
-              <div className="card">
-                <div className="card-header">
-                  <span className="card-label">Step 04</span>
-                  <span className="card-title">What You Will Give Up</span>
-                </div>
-                <div className="card-body">
-                  <div className="question-block">
-                    {QUARTERLY_EXERCISES[3].questions.map((q, i) => (
-                      <div className="q-item" key={i}>
-                        <p className="q-prompt">{q}</p>
-                        <textarea className="field" placeholder="Write your answer..." value={sacrificeAnswers[`q${i}`] || ""} onChange={(e) => setSacrificeAnswers((prev) => ({ ...prev, [`q${i}`]: e.target.value }))} />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
         )}
 
