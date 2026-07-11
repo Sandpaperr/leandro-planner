@@ -3,7 +3,8 @@ import WheelChart, { FLOOR } from "./WheelChart";
 
 const WHEEL_DOMAINS = [
   "Mission", "Money", "Body", "Spirit", "Home & Environment",
-  "Growth", "Romance", "Family & Friends", "Fun", "Communities"
+  "Growth", "Romance", "Family & Friends", "Fun", "Communities",
+  "Creativity & Creation"
 ];
 
 const OUTCOME_SECTIONS = [
