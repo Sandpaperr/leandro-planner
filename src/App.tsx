@@ -271,6 +271,12 @@ const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; items: 
       },
       {
         number: "07",
+        label: "Organise the Calendar",
+        type: "ritual",
+        question: "Open next week's calendar now. Block time for each of your Big 3 first, then arrange everything else around them.",
+      },
+      {
+        number: "08",
         label: "Floor Maintenance",
         type: "text",
         question: "Based on the Wheel pulse, what one or two things need a minimum viable action this week?",
@@ -278,7 +284,7 @@ const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; items: 
         placeholder: "The minimum viable actions that keep me stable...",
       },
       {
-        number: "08",
+        number: "09",
         label: "Energy and Joy Plan",
         type: "text",
         question: "What will fill my tank this week? (movement, people, music, dancing, something new)",
@@ -286,7 +292,7 @@ const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; items: 
         placeholder: "What fills my tank, and exactly when it happens...",
       },
       {
-        number: "09",
+        number: "10",
         label: "One Thing to Look Forward To",
         type: "text",
         question: "Something concrete in the next 7 days that genuinely excites you.",
@@ -294,7 +300,7 @@ const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; items: 
         placeholder: "I'm looking forward to...",
       },
       {
-        number: "10",
+        number: "11",
         label: "Closing Intention",
         type: "text",
         question: "One sentence. Sunday night, looking back: what would make this a week worth living?",
@@ -331,7 +337,7 @@ export default function PlanningSystem() {
   const [weeklyAnswers, setWeeklyAnswers] = useState<Record<string, string>>({});
   const [weeklyScores, setWeeklyScores] = useState<Record<string, number>>({});
   const [weeklyBig3, setWeeklyBig3] = useState(["", "", ""]);
-  const [ritualDone, setRitualDone] = useState(false);
+  const [weeklyRituals, setWeeklyRituals] = useState<Record<string, boolean>>({});
   const [dailyMorning, setDailyMorning] = useState<Record<string, string>>({ b1: "", b2: "", b3: "", t1: "", t2: "", t3: "" });
   const [dailyEvening, setDailyEvening] = useState({ win: "", adjust: "" });
   const [dateValue, setDateValue] = useState("");
@@ -747,8 +753,8 @@ export default function PlanningSystem() {
                         {item.type === "ritual" && (
                           <div className="ritual-row">
                             <p className="ritual-text">{item.question}</p>
-                            <button className={`ritual-btn no-print ${ritualDone ? "done" : ""}`} onClick={() => setRitualDone(!ritualDone)}>
-                              {ritualDone ? "✓ Done" : "Mark done"}
+                            <button className={`ritual-btn no-print ${weeklyRituals[item.number] ? "done" : ""}`} onClick={() => setWeeklyRituals((prev) => ({ ...prev, [item.number]: !prev[item.number] }))}>
+                              {weeklyRituals[item.number] ? "✓ Done" : "Mark done"}
                             </button>
                           </div>
                         )}
