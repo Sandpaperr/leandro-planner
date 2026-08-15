@@ -222,6 +222,7 @@ function DailyEntry({ doc }: { doc: StoredDoc }) {
         )}
         <QA q="One Win" a={str(evening.win)} />
         <QA q="One Adjustment" a={str(evening.adjust)} />
+        <QA q="Tomorrow's First Move" a={str(evening.first)} />
       </div>
     </details>
   );

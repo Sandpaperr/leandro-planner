@@ -13,7 +13,7 @@ import type { Session } from "./sync";
 
 type QDoc = { scores?: Record<string, number>; answers?: Record<string, string>; rituals?: Record<string, boolean>; costAnswers?: Record<string, string>; outcomes?: Array<Record<string, string>> };
 type WDoc = { answers?: Record<string, string>; scores?: Record<string, number>; big3?: string[]; rituals?: Record<string, boolean> };
-type DDoc = { morning?: Record<string, string>; evening?: { win: string; adjust: string }; date?: string };
+type DDoc = { morning?: Record<string, string>; evening?: Record<string, string>; date?: string };
 
 const PERIOD_KEYS = { daily: dailyKey(), weekly: weeklyKey(), quarterly: quarterlyKey() };
 const readQ = () => (loadDoc(PERIOD_KEYS.quarterly)?.data ?? {}) as QDoc;
@@ -21,9 +21,9 @@ const readW = () => (loadDoc(PERIOD_KEYS.weekly)?.data ?? {}) as WDoc;
 const readD = () => (loadDoc(PERIOD_KEYS.daily)?.data ?? {}) as DDoc;
 
 const EMPTY_OUTCOMES = () => [
-  { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
-  { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
-  { label: "", result: "", purpose: "", map: "", obstacles: "", identity: "" },
+  { label: "", result: "", purpose: "", map: "", obstacles: "", ifthen: "", identity: "" },
+  { label: "", result: "", purpose: "", map: "", obstacles: "", ifthen: "", identity: "" },
+  { label: "", result: "", purpose: "", map: "", obstacles: "", ifthen: "", identity: "" },
 ];
 
 export default function PlanningSystem() {
@@ -46,7 +46,7 @@ export default function PlanningSystem() {
   });
   const [weeklyRituals, setWeeklyRituals] = useState<Record<string, boolean>>(() => readW().rituals ?? {});
   const [dailyMorning, setDailyMorning] = useState<Record<string, string>>(() => readD().morning ?? { b1: "", b2: "", b3: "", t1: "", t2: "", t3: "" });
-  const [dailyEvening, setDailyEvening] = useState<{ win: string; adjust: string }>(() => readD().evening ?? { win: "", adjust: "" });
+  const [dailyEvening, setDailyEvening] = useState<Record<string, string>>(() => readD().evening ?? { win: "", adjust: "", first: "" });
   const [dateValue, setDateValue] = useState(() => readD().date ?? "");
 
   const updateOutcome = (idx: number, field: string, value: string) => {
@@ -609,7 +609,7 @@ export default function PlanningSystem() {
                               {[0, 1, 2].map((j) => (
                                 <div className="big3-row" key={j}>
                                   <span className="big3-n">0{j + 1}</span>
-                                  <input className="big3-input" placeholder={outcomes[j]?.label ? `${outcomes[j].label} — declared in present tense...` : `Outcome ${j + 1} — declared in present tense...`} value={quarterlyAnswers[`${item.number}-${j}`] || ""} onChange={(e) => setQuarterlyAnswers((prev) => ({ ...prev, [`${item.number}-${j}`]: e.target.value }))} />
+                                  <input className="big3-input" placeholder={`${outcomes[j]?.label || `Outcome ${j + 1}`} — I will..., because...`} value={quarterlyAnswers[`${item.number}-${j}`] || ""} onChange={(e) => setQuarterlyAnswers((prev) => ({ ...prev, [`${item.number}-${j}`]: e.target.value }))} />
                                 </div>
                               ))}
                             </div>
@@ -770,7 +770,7 @@ export default function PlanningSystem() {
                 </div>
                 <p className="daily-prompt">{block.prompt}</p>
                 <p className="daily-instruction">{block.instruction}</p>
-                <textarea className="field field-sm" placeholder={block.placeholder} value={i === 0 ? dailyEvening.win : dailyEvening.adjust} onChange={(e) => setDailyEvening((prev) => ({ ...prev, [i === 0 ? "win" : "adjust"]: e.target.value }))} />
+                <textarea className="field field-sm" placeholder={block.placeholder} value={dailyEvening[block.key] || ""} onChange={(e) => setDailyEvening((prev) => ({ ...prev, [block.key]: e.target.value }))} />
               </div>
             ))}
           </div>

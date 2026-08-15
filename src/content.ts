@@ -11,6 +11,7 @@ export const OUTCOME_SECTIONS = [
   { key: "purpose", label: "Purpose", prompt: "Why does this have to happen? What does it mean for your life, your freedom, your identity?", placeholder: "This matters because..." },
   { key: "map", label: "Massive Action Plan", prompt: "What are the 3 to 5 actions that will make this outcome inevitable?", placeholder: "The actions that move the needle..." },
   { key: "obstacles", label: "Obstacles", prompt: "What are the 2 to 3 things most likely to derail this? Name them now so they don't catch you off guard.", placeholder: "The things that will try to stop me..." },
+  { key: "ifthen", label: "If–Then Plans", prompt: "Turn each obstacle into a trigger plan: \"If [obstacle shows up], then I will [specific response].\" One per obstacle. This is the single most proven move in goal science — decide the response now so the moment doesn't decide it for you.", placeholder: "If..., then I will..." },
   { key: "identity", label: "Identity", prompt: "Who do you need to become for this to be inevitable? Not what you need to do. Who you need to be.", placeholder: "I am someone who..." },
 ];
 
@@ -81,7 +82,7 @@ export const QUARTERLY_PARTS: Array<{ part: string; title: string; time: string;
         number: "06",
         label: "Wheel of Life",
         type: "wheel",
-        instruction: "Full honest score across all 10 domains. First number, no overthinking.",
+        instruction: "Full honest score across every domain. First number, no overthinking.",
       },
       {
         number: "07",
@@ -93,8 +94,9 @@ export const QUARTERLY_PARTS: Array<{ part: string; title: string; time: string;
         number: "08",
         label: "The Real Question",
         type: "text",
-        question: "Looking at this honestly, where are you lying to yourself?",
-        placeholder: "The truth I've been avoiding...",
+        question: "Step outside yourself: if your closest friend went through this quarter's evidence — the scores, the numbers, what actually happened — what would they say you're avoiding?",
+        instruction: "Answer in their voice, not yours. Distance makes the truth easier to see and easier to use.",
+        placeholder: "They'd tell me that...",
       },
     ],
   },
@@ -108,8 +110,8 @@ export const QUARTERLY_PARTS: Array<{ part: string; title: string; time: string;
         label: "The 1-Year Vision",
         type: "text",
         question: "If the next 12 months go exactly as you want, what is true?",
-        instruction: "Be specific. Supercycle, Sabroso, body, relationships, experiences, who you've become. Write it as already done, present tense, emotionally charged.",
-        placeholder: "A year from now, it's true that...",
+        instruction: "Be specific. Supercycle, Sabroso, body, relationships, experiences, who you've become. Write it as already done, present tense, emotionally charged — then immediately name what currently stands between you and it. Vision without contrast is a daydream; the contrast is what converts it into drive.",
+        placeholder: "A year from now, it's true that... And what stands in the way today is...",
       },
       {
         number: "10",
@@ -145,10 +147,26 @@ export const QUARTERLY_PARTS: Array<{ part: string; title: string; time: string;
         number: "13",
         label: "Your 3 Outcomes",
         type: "outcomes",
-        instruction: "For each of your 3 focus areas, answer all 5 questions. Write in present tense, as if it has already happened.",
+        instruction: "For each of your 3 focus areas, work through all 6 sections. Write the Result in present tense — then spend your vividness on the path, not the podium: the obstacles and if-then plans are where achievement is actually decided.",
       },
       {
         number: "14",
+        label: "Want or Should?",
+        type: "text",
+        question: "For each of the 3: are you pursuing it from genuine desire and your own values — or from guilt, fear, or someone else's expectations?",
+        instruction: "Goals chosen from wants get more effort and are far more likely to land than goals chosen from shoulds. Anything driven by a should: reconnect it to something you truly want, or swap it out now.",
+        placeholder: "01 is a want because... 02 is... 03 is...",
+      },
+      {
+        number: "15",
+        label: "The Skill Check",
+        type: "text",
+        question: "Which of these do you already know how to achieve — and which need skills or knowledge you don't have yet?",
+        instruction: "For anything new, set a learning goal, not just an outcome goal: name the strategies you'll find and test this quarter. On unfamiliar terrain, chasing the number hurts performance; chasing the method wins.",
+        placeholder: "I already know how to... What I still need to learn is...",
+      },
+      {
+        number: "16",
         label: "The Constraint Question",
         type: "text",
         question: "What is the single biggest thing standing between you and all 3 of these? If you removed it, how much faster does everything move?",
@@ -162,14 +180,14 @@ export const QUARTERLY_PARTS: Array<{ part: string; title: string; time: string;
     time: "15 min",
     items: [
       {
-        number: "15",
+        number: "17",
         label: "What You Will Give Up",
         type: "text",
         question: "What behaviour, habit, or pattern has to stop for these 3 to happen?",
         placeholder: "I'm giving up...",
       },
       {
-        number: "16",
+        number: "18",
         label: "What You Will Protect",
         type: "text",
         question: "What non-negotiables stay in place regardless of how busy it gets?",
@@ -177,17 +195,17 @@ export const QUARTERLY_PARTS: Array<{ part: string; title: string; time: string;
         placeholder: "I protect, no matter what...",
       },
       {
-        number: "17",
+        number: "19",
         label: "The Cost of Not Doing This",
         type: "text",
         question: "Be specific. A year from now, if you didn't pursue these 3, what does that life look like? Feel like?",
         placeholder: "If I don't pursue these, a year from now...",
       },
       {
-        number: "18",
+        number: "20",
         label: "Closing Declaration",
         type: "declaration",
-        question: "One sentence per outcome, spoken out loud. Present tense. Full intensity.",
+        question: "One commitment per outcome, spoken out loud: \"I will [the action], because [what it makes possible].\" Full intensity — commit to actions and reasons, not wishes.",
       },
     ],
   },
@@ -221,7 +239,8 @@ export const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; 
         label: "Weekly Scorecard",
         type: "multi",
         questions: [
-          "Did I move the needle on each of my 3 this week?",
+          "Last week's Big 3: did each move actually happen — yes or no? Count it: _/3.",
+          "Confidence check: for each quarterly outcome, how confident are you it lands this quarter (1-10)? What moved each number up or down since last week?",
           "What got in the way?",
           "What would I do differently?",
         ],
@@ -270,12 +289,20 @@ export const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; 
       },
       {
         number: "07",
-        label: "Organise the Calendar",
-        type: "ritual",
-        question: "Open next week's calendar now. Block time for each of your Big 3 first, then arrange everything else around them.",
+        label: "If–Then Shields",
+        type: "text",
+        question: "What is most likely to derail this week's Big 3 — and what's the shield? \"If [derailer], then I will [response].\"",
+        instruction: "One per move if you can. Deciding the response in advance is worth more than any amount of motivation in the moment.",
+        placeholder: "If..., then I will...",
       },
       {
         number: "08",
+        label: "Organise the Calendar",
+        type: "ritual",
+        question: "Open next week's calendar now. Block time for each of your Big 3 first, then arrange everything else around them. Reality check before you close it: how much of what you blocked last week actually happened? Plan at that percentage, and leave one empty buffer block per day.",
+      },
+      {
+        number: "09",
         label: "Floor Maintenance",
         type: "text",
         question: "Based on the Wheel pulse, what one or two things need a minimum viable action this week?",
@@ -283,7 +310,7 @@ export const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; 
         placeholder: "The minimum viable actions that keep me stable...",
       },
       {
-        number: "09",
+        number: "10",
         label: "Energy and Joy Plan",
         type: "text",
         question: "What will fill my tank this week? (movement, people, music, dancing, something new)",
@@ -291,7 +318,7 @@ export const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; 
         placeholder: "What fills my tank, and exactly when it happens...",
       },
       {
-        number: "10",
+        number: "11",
         label: "One Thing to Look Forward To",
         type: "text",
         question: "Something concrete in the next 7 days that genuinely excites you.",
@@ -299,12 +326,18 @@ export const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; 
         placeholder: "I'm looking forward to...",
       },
       {
-        number: "11",
+        number: "12",
         label: "Closing Intention",
         type: "text",
         question: "One sentence. Sunday night, looking back: what would make this a week worth living?",
         placeholder: "This was a week worth living because...",
         fieldSm: true,
+      },
+      {
+        number: "13",
+        label: "Send the Scorecard",
+        type: "ritual",
+        question: "Send this week's scorecard and next week's Big 3 to someone who expects it. Progress that's witnessed gets finished — people who send weekly reports to a friend achieve roughly twice as much.",
       },
     ],
   },
@@ -316,6 +349,7 @@ export const DAILY_MORNING = [
 ];
 
 export const DAILY_EVENING = [
-  { icon: "◉", title: "One Win", prompt: "What are you most proud of today?", instruction: "One sentence. No more.", placeholder: "Today I..." },
-  { icon: "◌", title: "One Adjustment", prompt: "What would you do differently tomorrow?", instruction: "One thing only. Then close the book.", placeholder: "Tomorrow I will..." },
+  { key: "win", icon: "◉", title: "One Win", prompt: "What are you most proud of today?", instruction: "One sentence. No more.", placeholder: "Today I..." },
+  { key: "adjust", icon: "◌", title: "One Adjustment", prompt: "What would you do differently tomorrow?", instruction: "One thing only. Then close the book.", placeholder: "Tomorrow I will..." },
+  { key: "first", icon: "◍", title: "Tomorrow's First Move", prompt: "Tomorrow's Big 3 #1 — when and where does it start?", instruction: "Pre-load the trigger tonight so the morning doesn't have to decide.", placeholder: "At [time], at [place], I start with..." },
 ];
