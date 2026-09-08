@@ -343,6 +343,66 @@ export const WEEKLY_PHASES: Array<{ phase: string; title: string; time: string; 
   },
 ];
 
+// Weekly shop from the meal plan ("two cooks: Sunday slow cooker, Wednesday ragù").
+// One shop, seven days — the list repeats every week.
+export const GROCERY_SECTIONS: Array<{ section: string; items: Array<{ name: string; qty: string }> }> = [
+  {
+    section: "Protein",
+    items: [
+      { name: "Chicken thigh, skinless boneless", qty: "1.4 kg" },
+      { name: "Beef mince, 5% fat", qty: "690 g" },
+      { name: "Steak, rump or flat iron", qty: "230 g" },
+      { name: "Frozen white fish fillets", qty: "600 g" },
+      { name: "Beef slices, lean", qty: "250 g" },
+      { name: "Eggs", qty: "2 boxes of 12" },
+      { name: "Greek yogurt 0%", qty: "1 pot, 450 g" },
+    ],
+  },
+  {
+    section: "Veg and Fruit",
+    items: [
+      { name: "Butternut squash", qty: "2 large" },
+      { name: "Green beans", qty: "400 g" },
+      { name: "Onions", qty: "5" },
+      { name: "Bagged salad", qty: "2 bags" },
+      { name: "Frozen veg mix", qty: "1 kg" },
+      { name: "Fresh veg of choice", qty: "as much as you like" },
+      { name: "Fruit", qty: "7 pieces" },
+    ],
+  },
+  {
+    section: "Carbs",
+    items: [
+      { name: "Rice", qty: "1 kg" },
+      { name: "Gnocchi", qty: "700 g, 2 packs" },
+      { name: "Wholegrain bread", qty: "1 loaf" },
+      { name: "Tinned lentils or chickpeas", qty: "1 tin, 400 g" },
+    ],
+  },
+  {
+    section: "Store Cupboard",
+    items: [
+      { name: "Passata", qty: "1 carton" },
+      { name: "Extra virgin olive oil", qty: "1 bottle" },
+      { name: "Coconut milk", qty: "1 tin" },
+      { name: "Stock cubes", qty: "1 pack" },
+      { name: "Peanut butter", qty: "1 jar" },
+      { name: "Almonds, plain unsalted", qty: "150 g" },
+      { name: "Harissa, Dijon, soy, red wine vinegar", qty: "as needed" },
+      { name: "Paprika, oregano, garlic, chilli", qty: "as needed" },
+    ],
+  },
+];
+
+export const GROCERY_NOTES = [
+  { label: "Squash", note: "Two whole squash weigh about 2kg and you lose roughly 28% to skin and seeds, which lands near the 1.4kg the batch needs. Buy the two largest you can find." },
+  { label: "Yogurt", note: "A 450g pot is right if eggs are your default. Opened greek yogurt keeps five to seven days, so only size up to 900g if you reach for it two or three times a week." },
+  { label: "Fruit", note: "One fruit is about 150g: a medium apple, pear, orange or peach, a small banana, two kiwis or clementines, a handful of grapes. Apples and oranges keep two weeks, so buy those in bulk and berries for the front half of the week." },
+  { label: "Almonds", note: "Frutta secca is rest days only, and Saturday and Sunday now have no snack, so it is just Wednesday and Friday. That is 40g a week and a 150g bag lasts a month. Plain and unsalted, not roasted and salted." },
+  { label: "Water", note: "Two to three litres a day, and no sugary drinks. If plain water is the sticking point, sparkling water, plain tea and black coffee all count. Squash and juice do not." },
+  { label: "Oil", note: "The 5g of olive oil is raw, added at the plate, not cooking oil. Both cooks run without it: the batch on rendered fat and coconut milk, the ragù on the mince's own fat." },
+];
+
 export const DAILY_MORNING = [
   { icon: "◎", title: "Daily Big 3", prompt: "From your Weekly Big 3, what are the 3 tasks that move the needle today?", instruction: "Write them first. Do them first. Everything else is secondary.", fields: ["Big 3 #1", "Big 3 #2", "Big 3 #3"] },
   { icon: "◈", title: "Block the Time", prompt: "When exactly will you do each of your Big 3 today?", instruction: "Unscheduled intentions don't happen. Assign a time slot to each one.", fields: ["Big 3 #1 — time block", "Big 3 #2 — time block", "Big 3 #3 — time block"] },

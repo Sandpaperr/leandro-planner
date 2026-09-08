@@ -4,6 +4,7 @@ import Report from "./Report";
 import {
   WHEEL_DOMAINS, OUTCOME_SECTIONS, COST_THRESHOLD,
   QUARTERLY_PARTS, WEEKLY_PHASES, DAILY_MORNING, DAILY_EVENING,
+  GROCERY_SECTIONS, GROCERY_NOTES,
 } from "./content";
 import { dailyKey, weeklyKey, quarterlyKey, loadDoc, saveDoc, isEmptyDeep } from "./storage";
 import { syncConfigured, onSession, sendMagicLink, signOut, syncAll, pushDoc } from "./sync";
@@ -12,7 +13,7 @@ import type { Session } from "./sync";
 /* ---------- persistence plumbing (module scope) ---------- */
 
 type QDoc = { scores?: Record<string, number>; answers?: Record<string, string>; rituals?: Record<string, boolean>; costAnswers?: Record<string, string>; outcomes?: Array<Record<string, string>> };
-type WDoc = { answers?: Record<string, string>; scores?: Record<string, number>; big3?: string[]; rituals?: Record<string, boolean> };
+type WDoc = { answers?: Record<string, string>; scores?: Record<string, number>; big3?: string[]; rituals?: Record<string, boolean>; groceries?: Record<string, boolean> };
 type DDoc = { morning?: Record<string, string>; evening?: Record<string, string>; date?: string };
 
 const PERIOD_KEYS = { daily: dailyKey(), weekly: weeklyKey(), quarterly: quarterlyKey() };
@@ -45,6 +46,7 @@ export default function PlanningSystem() {
     return Array.isArray(stored) && stored.length === 3 ? stored : ["", "", ""];
   });
   const [weeklyRituals, setWeeklyRituals] = useState<Record<string, boolean>>(() => readW().rituals ?? {});
+  const [groceries, setGroceries] = useState<Record<string, boolean>>(() => readW().groceries ?? {});
   const [dailyMorning, setDailyMorning] = useState<Record<string, string>>(() => readD().morning ?? { b1: "", b2: "", b3: "", t1: "", t2: "", t3: "" });
   const [dailyEvening, setDailyEvening] = useState<Record<string, string>>(() => readD().evening ?? { win: "", adjust: "", first: "" });
   const [dateValue, setDateValue] = useState(() => readD().date ?? "");
@@ -62,7 +64,7 @@ export default function PlanningSystem() {
   const [authNotice, setAuthNotice] = useState("");
 
   const quarterlyDoc = () => ({ scores, answers: quarterlyAnswers, rituals: quarterlyRituals, costAnswers, outcomes });
-  const weeklyDoc = () => ({ answers: weeklyAnswers, scores: weeklyScores, big3: weeklyBig3, rituals: weeklyRituals });
+  const weeklyDoc = () => ({ answers: weeklyAnswers, scores: weeklyScores, big3: weeklyBig3, rituals: weeklyRituals, groceries });
   const dailyDoc = () => ({ morning: dailyMorning, evening: dailyEvening, date: dateValue });
 
   // Re-read the current period docs into state after a sync pull changed them.
@@ -78,6 +80,7 @@ export default function PlanningSystem() {
     if (w.scores) setWeeklyScores(w.scores);
     if (Array.isArray(w.big3) && w.big3.length === 3) setWeeklyBig3(w.big3);
     if (w.rituals) setWeeklyRituals(w.rituals);
+    if (w.groceries) setGroceries(w.groceries);
     const d = readD();
     if (d.morning) setDailyMorning(d.morning);
     if (d.evening) setDailyEvening(d.evening);
@@ -138,7 +141,7 @@ export default function PlanningSystem() {
   useEffect(() => {
     const t = setTimeout(() => persist(PERIOD_KEYS.weekly, weeklyDoc()), 500);
     return () => clearTimeout(t);
-  }, [weeklyAnswers, weeklyScores, weeklyBig3, weeklyRituals]);
+  }, [weeklyAnswers, weeklyScores, weeklyBig3, weeklyRituals, groceries]);
   useEffect(() => {
     const t = setTimeout(() => persist(PERIOD_KEYS.daily, dailyDoc()), 500);
     return () => clearTimeout(t);
@@ -353,6 +356,29 @@ export default function PlanningSystem() {
         .report-data-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
         .report-import-msg { font-family: 'Lato', sans-serif; font-size: 12px; font-style: italic; color: var(--ink-muted); }
 
+        /* GROCERIES */
+        .gro-sub { font-family: 'Lato', sans-serif; font-size: 13px; font-style: italic; color: var(--ink-muted); margin-bottom: 18px; text-align: left; }
+        .gro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; margin-bottom: 18px; }
+        .gro-card { margin-bottom: 0; }
+        .gro-count { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1px; color: var(--gold); }
+        .gro-body { padding: 8px 20px 12px; }
+        .gro-row { display: flex; align-items: center; gap: 12px; width: 100%; background: none; border: none; border-bottom: 1px solid var(--border-light); padding: 10px 0; cursor: pointer; text-align: left; }
+        .gro-row:last-child { border-bottom: none; }
+        .gro-box { width: 16px; height: 16px; border: 1px solid var(--border); border-radius: 3px; background: var(--ivory); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--white); transition: all 0.15s; }
+        .gro-row:hover .gro-box { border-color: var(--gold); }
+        .gro-row.done .gro-box { background: var(--gold); border-color: var(--gold); }
+        .gro-name { font-family: 'Lato', sans-serif; font-size: 14px; color: var(--ink-mid); flex: 1; line-height: 1.4; transition: color 0.15s; }
+        .gro-row.done .gro-name { color: var(--ink-faint); text-decoration: line-through; }
+        .gro-qty { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.5px; color: var(--ink-muted); white-space: nowrap; }
+        .gro-row.done .gro-qty { color: var(--ink-faint); }
+        .gro-notes { background: var(--white); border: 1px solid var(--border); border-radius: 6px; padding: 14px 18px; text-align: left; }
+        .gro-notes > summary { list-style: none; cursor: pointer; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--ink-faint); transition: color 0.15s; }
+        .gro-notes > summary::-webkit-details-marker { display: none; }
+        .gro-notes > summary::before { content: '＋ '; color: var(--gold); }
+        .gro-notes[open] > summary::before { content: '－ '; }
+        .gro-notes > summary:hover { color: var(--gold); }
+        .gro-notes-body { display: flex; flex-direction: column; gap: 12px; margin-top: 14px; }
+
         /* PRINT */
         @media print {
           body { background: white !important; }
@@ -377,12 +403,20 @@ export default function PlanningSystem() {
           .daily-block { border: 1px solid #ccc !important; }
           .score-btn.selected { background: #1A1714 !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .sub-prompt { background: #FFF8EC !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+          /* groceries print as a paper checklist: empty boxes, notes expanded */
+          .gro-grid { break-inside: avoid; }
+          .gro-card { break-inside: avoid; border: 1px solid #ccc !important; }
+          .gro-box { background: white !important; border: 1px solid #999 !important; color: white !important; }
+          .gro-row.done .gro-name { text-decoration: none; color: var(--ink-mid); }
+          .gro-notes { border: 1px solid #ccc !important; }
         }
 
         @media (max-width: 600px) {
           .app { padding: 24px 16px 60px; }
           .main-tabs { width: 100%; }
-          .main-tab { flex: 1; text-align: center; padding: 10px 8px; }
+          .main-tab { flex: 1; text-align: center; padding: 10px 6px; letter-spacing: 1px; }
+          .gro-grid { grid-template-columns: 1fr; }
         }
       `}</style>
 
@@ -395,7 +429,7 @@ export default function PlanningSystem() {
 
         <div className="tab-bar no-print">
           <div className="main-tabs">
-            {[{ id: "daily", label: "Daily" }, { id: "weekly", label: "Weekly" }, { id: "quarterly", label: "Quarterly" }, { id: "report", label: "Report" }].map((t) => (
+            {[{ id: "daily", label: "Daily" }, { id: "weekly", label: "Weekly" }, { id: "groceries", label: "Groceries" }, { id: "quarterly", label: "Quarterly" }, { id: "report", label: "Report" }].map((t) => (
               <button key={t.id} className={`main-tab ${tab === t.id ? "on" : ""}`} onClick={() => switchTab(t.id)}>
                 {t.label}
               </button>
@@ -775,6 +809,66 @@ export default function PlanningSystem() {
             ))}
           </div>
         )}
+
+        {/* GROCERIES */}
+        {tab === "groceries" && (() => {
+          const allItems = GROCERY_SECTIONS.flatMap((s) => s.items);
+          const totalDone = allItems.filter((it) => groceries[it.name]).length;
+          return (
+            <div>
+              <div className="phase-header">
+                <span className="phase-eyebrow">Weekly Shop</span>
+                <span className="phase-title">Groceries</span>
+                <span className="phase-time">{totalDone}/{allItems.length} in the trolley</span>
+              </div>
+              <p className="gro-sub">One shop, seven days. The list resets every week — tick things off as they go in.
+                {totalDone > 0 && (
+                  <button className="sync-link no-print" style={{ marginLeft: 10 }} onClick={() => setGroceries({})}>Reset list</button>
+                )}
+              </p>
+              <div className="gro-grid">
+                {GROCERY_SECTIONS.map((section) => {
+                  const done = section.items.filter((it) => groceries[it.name]).length;
+                  return (
+                    <div className="card gro-card" key={section.section}>
+                      <div className="card-header">
+                        <span className="card-label">{section.section}</span>
+                        <span className="gro-count">{done}/{section.items.length}</span>
+                      </div>
+                      <div className="card-body gro-body">
+                        {section.items.map((it) => {
+                          const checked = !!groceries[it.name];
+                          return (
+                            <button
+                              key={it.name}
+                              className={`gro-row ${checked ? "done" : ""}`}
+                              onClick={() => setGroceries((prev) => ({ ...prev, [it.name]: !prev[it.name] }))}
+                            >
+                              <span className="gro-box">{checked ? "✓" : ""}</span>
+                              <span className="gro-name">{it.name}</span>
+                              <span className="gro-qty">{it.qty}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <details className="gro-notes">
+                <summary>Buying notes</summary>
+                <div className="gro-notes-body">
+                  {GROCERY_NOTES.map((n) => (
+                    <div className="report-qa" key={n.label}>
+                      <p className="report-q">{n.label}</p>
+                      <p className="report-a">{n.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            </div>
+          );
+        })()}
 
         {/* REPORT */}
         {tab === "report" && <Report />}
