@@ -3,7 +3,7 @@
 export const WHEEL_DOMAINS = [
   "Mission", "Money", "Body", "Spirit", "Home & Environment",
   "Growth", "Romance", "Family & Friends", "Fun", "Communities",
-  "Creativity & Creation"
+  "Creativity & Creation", "Adventure & Novelty", "Contribution",
 ];
 
 export const OUTCOME_SECTIONS = [

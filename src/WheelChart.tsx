@@ -6,13 +6,15 @@ type WheelChartProps = {
   onChange: (domain: string, value: number) => void;
 };
 
-// Geometry of the radar chart.
-const SIZE_W = 600;
-const SIZE_H = 460;
-const CX = 300;
-const CY = 215;
-const R = 150;
-const LABEL_R = R + 26;
+// Geometry of the radar chart. The viewBox leaves room around the ring so
+// thirteen domain labels — several of them two lines — stay outside the
+// spokes without crowding each other or clipping the edge.
+const SIZE_W = 640;
+const SIZE_H = 520;
+const CX = 320;
+const CY = 250;
+const R = 155;
+const LABEL_R = R + 38;
 const LEVELS = 10;
 
 const TAU = Math.PI * 2;
@@ -32,20 +34,23 @@ function pointAt(angle: number, radius: number) {
   };
 }
 
-// Break a long domain name into at most two balanced lines for the labels.
+// Break a long domain name into at most two lines of similar length.
 function wrapLabel(label: string): string[] {
   if (label.length <= 12) return [label];
   const words = label.split(" ");
   if (words.length === 1) return [label];
-  const lines: string[] = ["", ""];
-  let idx = 0;
-  for (const w of words) {
-    if (idx === 0 && (lines[0] + " " + w).trim().length > 11 && lines[0] !== "") {
-      idx = 1;
+  let best = 1;
+  let bestDiff = Infinity;
+  for (let i = 1; i < words.length; i++) {
+    const left = words.slice(0, i).join(" ");
+    const right = words.slice(i).join(" ");
+    const diff = Math.abs(left.length - right.length);
+    if (diff < bestDiff) {
+      bestDiff = diff;
+      best = i;
     }
-    lines[idx] = (lines[idx] + " " + w).trim();
   }
-  return lines[1] ? [lines[0], lines[1]] : [lines[0]];
+  return [words.slice(0, best).join(" "), words.slice(best).join(" ")];
 }
 
 export default function WheelChart({ domains, scores, onChange }: WheelChartProps) {
